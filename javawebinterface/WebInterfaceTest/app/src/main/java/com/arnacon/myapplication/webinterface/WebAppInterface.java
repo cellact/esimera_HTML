@@ -1,11 +1,11 @@
-package com.arnacon.arnaconapp.webinterface;
+package com.arnacon.myapplication.webinterface;
 
 import android.content.Context;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
-import com.arnacon.arnaconapp.DisplayActivity;
+import com.arnacon.myapplication.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +61,7 @@ public class WebAppInterface {
                 break;
             case "accept-call":
                 if (from != null) {
-                    guiHandler.acceptCall();
+                    guiHandler.acceptCall(from);
                 }
                 break;
             case "reject-call":
@@ -71,51 +71,19 @@ public class WebAppInterface {
             case "end-call":
                 guiHandler.endCall();
                 break;
-
-            case "fetch":
-                if (callbackId != null) {
-                    //Log.d("webapp", "responding with callback" + callbackId);
-                    //sendResponseToJavaScript(callbackId, dataSaveHelper.getInviteLog().toString());
-                }
-                break;
         }
     }
 
-    private void sendResponseToJavaScript(String callbackId, String response) {
-        ((DisplayActivity) context).runOnUiThread(() -> {
-            try {
-                JSONObject jsonResponse = new JSONObject();
-                jsonResponse.put("callbackId", callbackId);
-                jsonResponse.put("response", response);
-
-                String script = "javascript:(function() { " +
-                        "if (window.controller.callbacks && window.controller.callbacks['" + callbackId + "']) {" +
-                        "    window.controller.callbacks['" + callbackId + "']('" + response + "');" +
-                        "    delete window.controller.callbacks['" + callbackId + "'];" +
-                        "}" +
-                        "})()";
-
-                webView.evaluateJavascript(script, null);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    public void sendActionToJavaScript(String action, JSONObject data) {
-        final String jsCode = "javascript:receiveMessageFromJava('" + action + "', " + data.toString() + ")";
-        ((DisplayActivity) context).runOnUiThread(() -> webView.evaluateJavascript(jsCode, null));
-    }
     public void ring(String to) {
-        ((DisplayActivity) context).runOnUiThread(() -> webView.evaluateJavascript("controller.ring('" + to + "');", null));
+        ((MainActivity) context).runOnUiThread(() -> webView.evaluateJavascript("controller.ring('" + to + "');", null));
     }
     public void callStarted(String from) {
-        ((DisplayActivity) context).runOnUiThread(() -> webView.evaluateJavascript("controller.callStarted('" + from + "');", null));
+        ((MainActivity) context).runOnUiThread(() -> webView.evaluateJavascript("controller.callStarted('" + from + "');", null));
     }
     public void callEnded() {
-        ((DisplayActivity) context).runOnUiThread(() -> webView.evaluateJavascript("controller.callEnded();", null));
+        ((MainActivity) context).runOnUiThread(() -> webView.evaluateJavascript("controller.callEnded();", null));
     }
     public void receivingCall(String from) {
-        ((DisplayActivity) context).runOnUiThread(() -> webView.evaluateJavascript("controller.receivingCall('" + from + "');", null));
+        ((MainActivity) context).runOnUiThread(() -> webView.evaluateJavascript("controller.receivingCall('" + from + "');", null));
     }
 }

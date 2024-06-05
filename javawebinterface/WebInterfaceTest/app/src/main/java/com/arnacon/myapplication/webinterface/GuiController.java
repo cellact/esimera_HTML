@@ -1,8 +1,6 @@
-package com.arnacon.arnaconapp.webinterface;
+package com.arnacon.myapplication.webinterface;
 
 import android.content.Context;
-
-import com.arnacon.arnaconapp.DataSaveHelper;
 
 public class GuiController {
 
