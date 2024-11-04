@@ -25,4 +25,4 @@ jobs:
 
       - name: Sync to GCS
         run: |
-          gsutil rsync -r . gs://gsm_html
+          gsutil -m rsync -r -x '(^\.git/.*|^\.github/.*|.*\.json$|\.DS_Store)' . gs://gsm_html
