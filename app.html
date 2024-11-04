@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>User Interface</title>
     <style>
         body {
@@ -20,14 +20,50 @@
             border: none;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                color: #ffffff;
+            }
+            iframe {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            }
+        }
     </style>
 </head>
 <body>
-    <iframe id="screen" src="mainScreen.html" frameBorder="0" style="width:100%; height:100vh;"></iframe>
+    <iframe id="screenFrame" frameBorder="0" style="width:100%; height:100vh;"></iframe>
     <script>
 
         const controller = window.top.controller;
         const channel = new BroadcastChannel('myChannel');
+        const screenFrame = document.getElementById('screenFrame');
+        const urlParams = new URLSearchParams(window.location.search);
+        const screen = urlParams.get('screen');
+        const localId = urlParams.get('localId');
+        const remoteId = urlParams.get('remoteId');
+
+        const userAgent = navigator.userAgent;
+        console.log("User Agent: " + userAgent);
+
+        switch (screen) {
+            case 'MAIN':
+                screenFrame.src = "mainScreen.html";
+                break;
+            case 'CHAT':
+                screenFrame.src = "chat.html?sessionId=" + encodeURIComponent(remoteId);
+                break;
+            case 'CALL':
+                screenFrame.src = "inCall.html?to=" + encodeURIComponent(remoteId);
+                break;
+            case 'RING':
+                screenFrame.src = "ringing.html?to=" + encodeURIComponent(remoteId);
+                break;
+            case 'INCOMING':
+                screenFrame.src = "incomingCall.html?from=" + encodeURIComponent(remoteId);
+                break;
+        }
 
         class App {
             constructor(ens, main, ringing, callAttempt, inCall, incomingCall) {
@@ -39,29 +75,32 @@
                     "inCall": inCall,
                     "incomingCall": incomingCall
                 };
-                this.setPage('main'); // Set initial page
             }
 
             setPage(pageId, param = {}) {
-                const iframe = document.getElementById("screen");
+                const iframe = document.getElementById("screenFrame");
                 iframe.src = this.urls[pageId];
                 if (Object.keys(param).length > 0) {
-                    iframe.src += `?${param.key}=${param.value}`;
+                    iframe.src += `?${param.key}=${encodeURIComponent(param.value)}`;
                 }
             }
 
             ring(to) {
-                this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
+                //this.setPage('ringing', {key:"to",value:to});
+                if (screen === 'MAIN') {
+                    this.setPage('main')
+                }
             }
-            callAttempt(to) {
-                this.setPage('callAttempt', {key:"to",value:to}); // Show call attempt screen
-                controller.call(to);
+            callAttempt(contact,remoteId) {
+                this.setPage('callAttempt', {key:"to",value:contact}); // Show call attempt screen
+                controller.call(remoteId);
             }
             callStarted(_with) {
                 this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
             }
-            callEnded() {
-                this.setPage('main'); // End call logic and show main screen
+            callEnded(remoteId) {
+                controller.rejectCall(remoteId);
+                this.setPage('main');
             }
             receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
@@ -90,11 +129,11 @@
 
         const app = new App(
             "test.eth",
-            "https://htmltest-theta.vercel.app/mainScreen.html",
-            "https://htmltest-theta.vercel.app/ringing.html",
-            "https://htmltest-theta.vercel.app/callattempt.html",
-            "https://htmltest-theta.vercel.app/inCall.html",
-            "https://htmltest-theta.vercel.app/incomingCall.html"
+            "mainScreen.html",
+            "ringing.html",
+            "callattempt.html",
+            "inCall.html",
+            "incomingCall.html"
         );
 
         window.app = app;
@@ -110,13 +149,13 @@
                     app.ring(body.to);
                     break;
                 case 'call-attempt':
-                    app.callAttempt(body.to);
+                    app.callAttempt(body.contact, body.id);
                     break;
                 case 'call-started':
                     app.callStarted(body.from);
                     break;
                 case 'call-ended':
-                    app.callEnded(body.from);
+                    app.callEnded(body.remoteId);
                     break;
                 case 'receiving-call':
                     app.receivingCall(body.from);
@@ -139,7 +178,16 @@
                 case 'remote-hold-state':
                     app.dataFetched(body);
                     break;
+                case 'active-calls':
+                    app.dataFetched(body);
+                    break;
                 case 'speaker-state':
+                    app.dataFetched(body);
+                    break;
+                case 'recent-messages':
+                    app.dataFetched(body);
+                    break;
+                case 'new-message':
                     app.dataFetched(body);
                     break;
                 default:
