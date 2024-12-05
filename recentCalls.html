@@ -99,6 +99,7 @@
     <ul id="recent-calls" class="recent-calls"></ul>
 
     <script>
+        
         const channel = new BroadcastChannel('myChannel');
 
         class RecentCallsComponent {
@@ -109,8 +110,16 @@
             }
 
             init() {
+                const calls = [["test.eth",
+                    "met",
+                    1733393072000,
+                    "INCOMING"
+]
+                ]
+                this.updateRecentCalls(calls)
                 this.controller.getRecentCalls();
                 channel.addEventListener("message", this.handleMessage.bind(this));
+
             }
 
             handleMessage(event) {
@@ -127,6 +136,7 @@
 
             updateRecentCalls(recentCalls) {
                 this.container.innerHTML = ""; // Clear existing logs
+                console.log("updating recent")
                 recentCalls.forEach(call => {
                     const [contact, id, timestamp, status] = call;
                     const callDate = new Date(timestamp);
