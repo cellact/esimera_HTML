@@ -20,7 +20,7 @@
         .recent-calls {
             width: 100%;
             max-width: 400px;
-            margin: 0;
+            margin: 10px;
             padding: 0;
             list-style: none;
             background: rgba(255, 255, 255, 0.1);
@@ -110,13 +110,13 @@
             }
 
             init() {
-                const calls = [["test.eth",
-                    "met",
-                    1733393072000,
-                    "INCOMING"
-]
-                ]
-                this.updateRecentCalls(calls)
+//                 const calls = [["test.eth",
+//                     "met",
+//                     1733393072000,
+//                     "INCOMING"
+// ]
+//                 ]
+//                 this.updateRecentCalls(calls)
                 this.controller.getRecentCalls();
                 channel.addEventListener("message", this.handleMessage.bind(this));
 
