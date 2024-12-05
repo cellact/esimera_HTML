@@ -79,9 +79,6 @@
             <h2>Ringing <span id="name"></span></h2>
         </div>
         <div class="action-buttons">
-            <button class="action-button accept-call" id="acceptButton">
-                <i class="material-icons">call</i> Answer
-            </button>
             <button class="action-button end-call" id="hangUpButton">
                 <i class="material-icons">call_end</i> Hang Up
             </button>
@@ -96,11 +93,6 @@
         if (to) {
             document.querySelector("#name").textContent = to;
         }
-
-        document.querySelector("#acceptButton").addEventListener("click", () => {
-            controller.answerCall(to);
-        });
-
         document.querySelector("#hangUpButton").addEventListener("click", () => {
             controller.rejectCall(to);
         });
