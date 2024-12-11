@@ -14,20 +14,20 @@
             --dark-purple: #4b0082;
         }
 
-        /* Reset & Disable Highlights */
+        /* Reset & Android WebView Tweaks */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             transition: all 0.3s ease;
-            outline: none; /* Remove default focus outline */
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+        :focus {
+            outline: none !important;
         }
 
-        html, body, input, button, select, textarea {
-            -webkit-tap-highlight-color: rgba(0,0,0,0); /* Remove tap highlight */
-        }
-
-        body {
+        html, body {
             height: 100%;
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, var(--primary-white) 0%, var(--light-purple) 100%);
@@ -38,7 +38,6 @@
             display: flex;
             flex-direction: column;
             user-select: none;
-            -webkit-touch-callout: none; /* Disable callout on long press */
         }
 
         .container {
@@ -47,11 +46,12 @@
             flex-direction: column;
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
+            box-sizing: border-box;
+            border-radius: 0;
+            box-shadow: none;
             width: 100%;
             margin: 0;
             overflow: hidden;
-            border-radius: 0; 
-            box-shadow: none;
         }
 
         .input-container {
@@ -70,12 +70,13 @@
             font-size: 16px;
             background-color: var(--primary-white);
             color: var(--dark-purple);
+            outline: none;
         }
 
         input[type="text"]:focus {
             border-color: var(--secondary-purple);
             box-shadow: 0 0 10px rgba(106, 90, 205, 0.2);
-            /* Removed transform scaling */
+            transform: scale(1.02);
         }
 
         .call-button {
@@ -89,8 +90,7 @@
             box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
         }
 
-        /* Use :active instead of :hover to avoid sticky hover states on mobile */
-        .call-button:active {
+        .call-button:hover, .call-button:active {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
         }
@@ -117,6 +117,7 @@
             box-shadow: none;
         }
 
+        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -164,7 +165,7 @@
             box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
         }
 
-        .cancel-button:active {
+        .cancel-button:hover {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
         }
@@ -174,6 +175,7 @@
             height: 24px;
         }
 
+        /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -223,8 +225,12 @@
         callButton.addEventListener("click", function() {
             if (input.value != "") {
                 makeCall({contact: input.value, id: input.value});
+            } else {
+                // Blur the button after click if no input provided to reset its state
+                setTimeout(() => {
+                    callButton.blur();
+                }, 200);
             }
-            // No additional blur needed since we rely only on :active now
         });
 
         window.addEventListener('message', (event) => {
@@ -235,6 +241,9 @@
 
         function makeCall(jsonData) {
             if (jsonData != null) {
+                // Blur the call button after clicking call
+                callButton.blur();
+
                 // Create modal overlay
                 const modalOverlay = document.createElement('div');
                 modalOverlay.classList.add('modal-overlay');
@@ -255,7 +264,7 @@
                 // Create an img element
                 const cancelImage = document.createElement('img');
                 cancelImage.src = './images/call_end.png'; 
-                cancelImage.alt = 'Cancel';
+                cancelImage.alt = 'Cancel'; 
 
                 // Append the image to the button
                 cancelButton.appendChild(cancelImage);
