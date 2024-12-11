@@ -5,104 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Call Page</title>
     <style>
-        /* General Reset */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: #6a5acd;
+            --light-purple: #9370db;
+            --dark-purple: #4b0082;
         }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, white, #c8c8c8);
-            color: #ffffff;
+        /* Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary-white) 0%, var(--light-purple) 100%);
+            color: var(--dark-purple);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            user-select: none;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 90%;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            box-sizing: border-box;
+            /* Fill entire area, no rounded corners */
+            border-radius: 0;
+            box-shadow: none;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
         }
 
         .input-container {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            position: relative;
             gap: 10px;
-            width: 100%;
         }
 
         input[type="text"] {
-            flex-grow: 1;
-            padding: 12px;
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--light-purple);
+            border-radius: 15px;
             font-size: 16px;
-            border: none;
-            border-radius: 30px;
-            background: rgba(255, 255, 255, 0.8);
-            color: #333;
+            background-color: var(--primary-white);
+            color: var(--dark-purple);
             outline: none;
-            transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease;
         }
 
         input[type="text"]:focus {
-            transform: scale(1.05);
-            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.5);
+            border-color: var(--secondary-purple);
+            box-shadow: 0 0 10px rgba(106, 90, 205, 0.2);
+            transform: scale(1.02);
         }
 
         .call-button {
             width: 48px;
             height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff007f, #7b00ff);
+            border-radius: 15px;
+            background-color: var(--secondary-purple);
             border: none;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
+            transition: all 0.3s ease;
         }
 
         .call-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .call-button:active {
-            transform: scale(1.05);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
         }
 
         .call-button::after {
             content: "";
-            background: url('./images/call.png') no-repeat center center;
-            background-size: 24px;
+            position: absolute;
             width: 24px;
             height: 24px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: url('./images/call.png') no-repeat center center;
+            background-size: 24px 24px;
         }
 
         iframe {
             flex: 1;
             width: 100%;
-            height: 100%;
-            border: none;
+            border: 2px solid var(--light-purple);
             border-radius: 15px;
+            background: var(--primary-white);
             margin-top: 20px;
-            /* background: rgba(0, 0, 0, 0.2); */
-            box-shadow: inset 0px 4px 10px rgba(255, 255, 255, 0.2);
+            box-shadow: none;
         }
 
         /* Modal Overlay */
@@ -122,26 +132,27 @@
         }
 
         .modal-content {
-            background: white;
-            border-radius: 15px;
+            background: var(--primary-white);
+            border-radius: 20px;
             padding: 20px;
             text-align: center;
             width: 300px;
             box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
             transform: scale(0.9);
             animation: popIn 0.3s forwards;
+            color: var(--dark-purple);
+            font-family: 'Poppins', sans-serif;
         }
 
         .modal-content p {
             margin: 0 0 20px 0;
-            color: #333;
             font-size: 18px;
         }
 
         .cancel-button {
             border: none;
-            background: #ff0033;
-            border-radius: 50%;
+            background: var(--secondary-purple);
+            border-radius: 15px;
             width: 50px;
             height: 50px;
             display: flex;
@@ -149,15 +160,17 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease-in-out;
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
+        }
+
+        .cancel-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
         }
 
         .cancel-button img {
             width: 24px;
             height: 24px;
-        }
-
-        .cancel-button:hover {
-            background: #ff3344;
         }
 
         /* Animations */
@@ -236,14 +249,12 @@
                 // Create cancel button
                 const cancelButton = document.createElement('button');
                 cancelButton.classList.add('cancel-button');
-                cancelButton.setAttribute('aria-label', 'Cancel'); // For accessibility
+                cancelButton.setAttribute('aria-label', 'Cancel');
 
                 // Create an img element
                 const cancelImage = document.createElement('img');
-                cancelImage.src = './images/call_end.png'; // Path to your local PNG image
-                cancelImage.alt = 'Cancel'; // Alternative text for accessibility
-                cancelImage.style.width = '24px'; // Adjust the size as needed
-                cancelImage.style.height = '24px';
+                cancelImage.src = './images/call_end.png'; 
+                cancelImage.alt = 'Cancel'; 
 
                 // Append the image to the button
                 cancelButton.appendChild(cancelImage);
