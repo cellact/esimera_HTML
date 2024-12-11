@@ -14,12 +14,17 @@
             --dark-purple: #4b0082;
         }
 
-        /* Reset */
+        /* Reset & Android WebView Tweaks */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+        :focus {
+            outline: none !important;
         }
 
         html, body {
@@ -42,7 +47,6 @@
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             box-sizing: border-box;
-            /* Fill entire area, no rounded corners */
             border-radius: 0;
             box-shadow: none;
             width: 100%;
@@ -67,7 +71,6 @@
             background-color: var(--primary-white);
             color: var(--dark-purple);
             outline: none;
-            transition: all 0.3s ease;
         }
 
         input[type="text"]:focus {
@@ -85,10 +88,9 @@
             cursor: pointer;
             position: relative;
             box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
-            transition: all 0.3s ease;
         }
 
-        .call-button:hover {
+        .call-button:hover, .call-button:active {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
         }
@@ -223,6 +225,11 @@
         callButton.addEventListener("click", function() {
             if (input.value != "") {
                 makeCall({contact: input.value, id: input.value});
+            } else {
+                // Blur the button after click if no input provided to reset its state
+                setTimeout(() => {
+                    callButton.blur();
+                }, 200);
             }
         });
 
@@ -234,6 +241,9 @@
 
         function makeCall(jsonData) {
             if (jsonData != null) {
+                // Blur the call button after clicking call
+                callButton.blur();
+
                 // Create modal overlay
                 const modalOverlay = document.createElement('div');
                 modalOverlay.classList.add('modal-overlay');
