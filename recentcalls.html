@@ -53,7 +53,6 @@
 
         .call-details {
             flex-grow: 1;
-            color: #ffffff;
         }
 
         .contact-name {
@@ -111,16 +110,8 @@
             }
 
             init() {
-//                 const calls = [["test.eth",
-//                     "met",
-//                     1733393072000,
-//                     "INCOMING"
-// ]
-//                 ]
-//                 this.updateRecentCalls(calls)
                 this.controller.getRecentCalls();
                 channel.addEventListener("message", this.handleMessage.bind(this));
-
             }
 
             handleMessage(event) {
