@@ -25,4 +25,10 @@ jobs:
 
       - name: Sync to GCS
         run: |
+          # Sync all files to the bucket
           gsutil -m rsync -r -x '(^\.git/.*|^\.github/.*|.*\.json$|\.DS_Store)' . gs://gsm_html
+
+      - name: Set Cache-Control headers
+        run: |
+          # Set no-cache headers so that browsers always fetch the latest version
+          gsutil -m setmeta -h "Cache-Control: no-cache, no-store, must-revalidate" gs://gsm_html/**
