@@ -3,7 +3,7 @@ name: Sync to GCS
 on:
   push:
     branches:
-      - main
+      - production-gsm
 
 jobs:
   sync:
