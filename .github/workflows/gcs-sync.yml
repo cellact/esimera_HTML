@@ -31,4 +31,4 @@ jobs:
       - name: Set Cache-Control headers
         run: |
           # Set the Cache-Control header to cache for 24 hours
-          gsutil -m setmeta -h "Cache-Control: public, max-age=86400" gs://html_gsm/**
+          gsutil -m setmeta -h "Cache-Control: no-cache, no-store, must-revalidate" gs://html_gsm/**
