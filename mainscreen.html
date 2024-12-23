@@ -176,30 +176,6 @@
             font-size: 18px;
         }
 
-        .cancel-button {
-            border: none;
-            background: var(--secondary-purple);
-            border-radius: 15px;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease-in-out;
-            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
-        }
-
-        .cancel-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
-        }
-
-        .cancel-button img {
-            width: 24px;
-            height: 24px;
-        }
-
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -285,29 +261,11 @@
                 const message = document.createElement('p');
                 message.textContent = `Attempting to call ${jsonData.contact}`;
 
-                const cancelButton = document.createElement('button');
-                cancelButton.classList.add('cancel-button');
-                cancelButton.setAttribute('aria-label', 'Cancel');
-
-                const cancelImage = document.createElement('img');
-                cancelImage.src = './images/call_end.png';
-                cancelImage.alt = 'Cancel';
-
-                cancelButton.appendChild(cancelImage);
                 modalContent.appendChild(message);
-                modalContent.appendChild(cancelButton);
                 modalOverlay.appendChild(modalContent);
                 document.body.appendChild(modalOverlay);
 
                 controller.call(jsonData.id);
-
-                cancelButton.addEventListener('click', function() {
-                    const endAttemptRequest = {
-                        action: "call-ended",
-                        body: {remoteId: jsonData.contact}
-                    };
-                    window.parent.postMessage(endAttemptRequest, '*');
-                });
             }
         }
     </script>
