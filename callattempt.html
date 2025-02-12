@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ringing</title>
+    <title>CallAttempt</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,7 +11,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: white;
+            background-color: #f0f0f0;
             margin: 0;
             webkit-user-select: none; 
             user-select: none;
@@ -37,7 +37,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>Ringing <span id="name"></span></h2>
+        <h2>Attempting to call <span id="name"></span></h2>
         <button>Hang Up</button>
     </div>
     <script>
@@ -45,14 +45,13 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         
-        const to = decodeURIComponent(urlParams.get('to'));
+        const to = urlParams.get('to');
         if(to){
             document.querySelector("#name").textContent = to;
         }
         document.querySelector("button").addEventListener("click", ()=>{
             controller.rejectCall(to);
-        })
-        
+        })      
     </script>
 </body>
 </html>

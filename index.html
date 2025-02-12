@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta http-equiv="Cache-control" content="public">
     <title>Native Communication</title>
     <style>
         body {
@@ -14,6 +13,7 @@
             height: 100%;
             background-color: #ffffff;
             margin: 0;
+            width:100%
         }
     </style>
 </head>
@@ -194,14 +194,6 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            contactPicker() {
-                const request = {
-                    action: "contact-picker",
-                    body: { localId: this.localId, pid: this.pid }
-                };
-                this.sendMessageToNativeApp(request);
-            }
-
             // Webview capabilities
 
             displayBackButton(bool) {
@@ -215,6 +207,14 @@
             receiveMessage(event) {
                 const { action, body} = event.data;
                 this.sendMessage(action, body);
+            }
+
+            chatOpened(remoteId){
+                const openChatRequest = {
+                    action: "open-chat",
+                    body: { sessionId: remoteId, localId:localId }
+                };
+                this.sendMessageToNativeApp(openChatRequest);
             }
         }
 

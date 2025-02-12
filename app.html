@@ -11,7 +11,7 @@
             justify-content: center;
             align-items: center;
             height: 100%;
-            background-color: #ffffff;
+            background-color: #fff;
             margin: 0;
         }
         iframe {
@@ -44,24 +44,30 @@
         const localId = urlParams.get('localId');
         const remoteId = urlParams.get('remoteId');
 
-        const userAgent = navigator.userAgent;
-        console.log("User Agent: " + userAgent);
-//test commit 2
         switch (screen) {
             case 'MAIN':
-                screenFrame.src = "mainscreen.html";
+                screenFrame.src = "mainScreen.html";
                 break;
             case 'CHAT':
-                screenFrame.src = "chat.html?sessionId=" + encodeURIComponent(remoteId);
+            //    history.replaceState({}, '', 'app.html?screen=MAIN&localId='+encodeURIComponent(localId)+'&remoteId=null');
+                screenFrame.src = "mainScreen.html?remoteId="+encodeURIComponent(remoteId);
+            //    screenFrame.onload = function() {
+            //        screenFrame.contentWindow.postMessage({
+            //            action: 'chat',
+            //            body: {
+            //                sessionId: encodeURIComponent(remoteId)
+            //            }
+            //       }, '*');
+            //    };
                 break;
             case 'CALL':
-                screenFrame.src = "incall.html?to=" + encodeURIComponent(remoteId);
+                screenFrame.src = "inCall.html?to=" + encodeURIComponent(remoteId);
                 break;
             case 'RING':
                 screenFrame.src = "ringing.html?to=" + encodeURIComponent(remoteId);
                 break;
             case 'INCOMING':
-                screenFrame.src = "incomingcall.html?from=" + encodeURIComponent(remoteId);
+                screenFrame.src = "incomingCall.html?from=" + encodeURIComponent(remoteId);
                 break;
         }
 
@@ -91,16 +97,15 @@
                     this.setPage('main')
                 }
             }
-            callAttempt(contact,remoteId) {
-                this.setPage('callAttempt', {key:"to",value:contact}); // Show call attempt screen
-                controller.call(remoteId);
+            callAttempt(to) {
+                this.setPage('callAttempt', {key:"to",value:to}); // Show call attempt screen
+                controller.call(to);
             }
             callStarted(_with) {
                 this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
             }
-            callEnded(remoteId) {
-                controller.rejectCall(remoteId);
-                this.setPage('main');
+            callEnded() {
+                //this.setPage('main');
             }
             receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
@@ -129,14 +134,18 @@
 
         const app = new App(
             "test.eth",
-            "mainscreen.html",
-            "ringing.html",
-            "callattempt.html",
-            "incall.html",
-            "incomingcall.html"
+            "https://htmltest-theta.vercel.app/mainScreen.html",
+            "https://htmltest-theta.vercel.app/ringing.html",
+            "https://htmltest-theta.vercel.app/callattempt.html",
+            "https://htmltest-theta.vercel.app/inCall.html",
+            "https://htmltest-theta.vercel.app/incomingCall.html"
         );
 
         window.app = app;
+
+        window.addEventListener('popstate', () => {
+            screenFrame.contentWindow.postMessage({ action: 'closeChat' }, '*');
+        });
 
         window.addEventListener('message', (event) => {
             console.log('Received message:', event.data);
@@ -149,13 +158,13 @@
                     app.ring(body.to);
                     break;
                 case 'call-attempt':
-                    app.callAttempt(body.contact, body.id);
+                    app.callAttempt(body.to);
                     break;
                 case 'call-started':
                     app.callStarted(body.from);
                     break;
                 case 'call-ended':
-                    app.callEnded(body.remoteId);
+                    app.callEnded(body.from);
                     break;
                 case 'receiving-call':
                     app.receivingCall(body.from);
@@ -190,10 +199,6 @@
                 case 'new-message':
                     app.dataFetched(body);
                     break;
-                case 'inject-remote-id':
-                    app.dataFetched(body);
-                    break;
-                    
                 default:
                     console.log('Unknown action:', action);
                     break;

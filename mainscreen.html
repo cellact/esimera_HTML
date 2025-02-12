@@ -2,30 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Call Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Purple Connect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide-icons/0.321.0/font/lucide.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container, #chat-container {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #chat-container {
+            position: fixed;
+            top: 0;
+            left: 100%;
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+
+        .slide-left {
+            transform: translateX(-100%);
+        }
+
 
         :root {
             --primary-white: #ffffff;
             --secondary-purple: #6a5acd;
             --light-purple: #9370db;
             --dark-purple: #4b0082;
-            --green: #10b02a;
         }
 
-        /* Reset & Android WebView Tweaks */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             transition: all 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-        }
-        :focus {
-            outline: none !important;
         }
 
         html, body {
@@ -39,19 +59,20 @@
             display: flex;
             flex-direction: column;
             user-select: none;
+            -webkit-user-select: none; /* Prevent text selection */
         }
-
+        .slide-left {
+            transform: translateX(-100%);
+        }
         .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: rgba(255, 255, 255, 0.9);
+            width:100%;
+            /* max-width: 600px; */
+            margin: 0 auto;
             padding: 20px;
-            box-sizing: border-box;
-            border-radius: 0;
-            box-shadow: none;
-            width: 100%;
-            margin: 0;
+            background: rgba(255, 255, 255, 0.9);
+            /* border-radius: 20px; */
+            box-shadow: 0 10px 30px rgba(106, 90, 205, 0.2);
+            position: relative;
             overflow: hidden;
         }
 
@@ -60,214 +81,274 @@
             align-items: center;
             margin-bottom: 20px;
             position: relative;
-            gap: 10px;
+            gap:5px
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            color: var(--secondary-purple);
+            z-index: 10;
         }
 
         input[type="text"] {
-            flex: 1;
-            min-width: 0;  /* Allows input to shrink below default min-width */
-            padding: 15px;
+            width: 100%;
+            padding: 15px 15px 15px 50px;
             border: 2px solid var(--light-purple);
             border-radius: 15px;
             font-size: 16px;
             background-color: var(--primary-white);
             color: var(--dark-purple);
             outline: none;
+            transition: all 0.3s ease;
         }
 
         input[type="text"]:focus {
             border-color: var(--secondary-purple);
             box-shadow: 0 0 10px rgba(106, 90, 205, 0.2);
-            transform: scale(1.02);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .action-button {
-            width: 48px;  /* Same as height for square buttons */
-            height: 48px;
-            aspect-ratio: 1;  /* Maintains square shape */
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: none;
             border-radius: 15px;
             background-color: var(--secondary-purple);
-            border: none;
+            color: var(--primary-white);
+            font-weight: 600;
             cursor: pointer;
-            position: relative;
+            transition: all 0.3s ease;
+            gap: 10px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
         }
 
-        .action-button:active {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
+        .action-button.message {
+            background-color: var(--light-purple);
         }
 
-        .action-button::after {
-            content: "";
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap:10px
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
             position: absolute;
-            width: 24px;
-            height: 24px;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            background-size: 24px 24px;
-            background-repeat: no-repeat;
-            background-position: center center;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--light-purple);
+            transition: .4s;
+            border-radius: 34px;
         }
 
-        .call-button {
-            width: 72px;  /* 1.5x height for slightly wider call button */
-            height: 48px;
-            aspect-ratio: 1.5;
-            background-color: var(--green);
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
         }
 
-        .call-button::after {
-            background-image: url('./images/call.png');
+        input:checked + .slider {
+            background-color: var(--secondary-purple);
         }
 
-        .contacts-button::after {
-            background-image: url('./images/contacts.png');
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .iframe-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+            height: 100%;
         }
 
         iframe {
             flex: 1;
             width: 100%;
             height: 100%;
+
             border: 2px solid var(--light-purple);
             border-radius: 15px;
             background: var(--primary-white);
-            margin-top: 20px;
-            box-shadow: none;
-            min-height: 0;
+            margin-bottom: 10px;
         }
-
-        /* Modal Overlay */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            opacity: 0;
-            animation: fadeIn 0.3s forwards;
-        }
-
-        .modal-content {
-            background: var(--primary-white);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            width: 300px;
-            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-            transform: scale(0.9);
-            animation: popIn 0.3s forwards;
-            color: var(--dark-purple);
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content p {
-            margin: 0 0 20px 0;
-            font-size: 18px;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.9); }
-            to { transform: scale(1); }
+        
+        .chat-iframe {
+            border-radius: 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="input-container">
-            <input type="text" id="numberInput" placeholder="Enter number...">
-            <button class="action-button call-button" aria-label="Call"></button>
-            <button class="action-button contacts-button" aria-label="Contacts"></button>
-
+            <i class="lucide lucide-phone-call input-icon"></i>
+            <input type="text" placeholder="Enter number or name" id="numberInput">
+            <button class="action-button message">+</button>
+            </div>
+        <!-- <div class="toggle-container">
+            <span class="toggle-title">Text Mode</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="keyboardToggle">
+                <span class="slider"></span>
+            </label>
+        </div> -->
+        <!-- <div class="action-buttons">
+            <button class="action-button call">
+                <i class="lucide lucide-phone"></i>
+                Call
+            </button>
+            <button class="action-button message">
+                <i class="lucide lucide-message-circle"></i>
+                Message
+            </button>
+        </div> -->
+        <div class="iframe-container">
+            <!-- <iframe src="recentCalls.html" class="shimmer"></iframe> -->
+            <iframe src="recentMessages.html" class="shimmer"></iframe>
         </div>
-        <iframe src="recentcalls.html"></iframe>
     </div>
+    <div id="chat-container"></div>
     <script>
         const controller = window.top.controller;
-        const app = window.parent.app;
         const input = document.querySelector("#numberInput");
-        const callButton = document.querySelector(".call-button");
-        const contactsButton = document.querySelector(".contacts-button");
+        const callButton = document.querySelector(".call");
+        const messageButton = document.querySelector(".message");
+        const domainButtons = document.querySelectorAll(".domain-button");
+        const keyboardToggle = document.querySelector("#keyboardToggle");
+        const buttonContainer = document.querySelector(".button-container");
+        const chatContainer = document.getElementById('chat-container');
 
-        const channel = new BroadcastChannel('myChannel');
-        
-        controller.getAudioDevices();
+        const urlParams = new URLSearchParams(window.location.search);
+        const remoteId = urlParams.get('remoteId');
+
+        if(remoteId != null) {
+            openChat(remoteId);
+        }
 
         // Set initial input type
-        input.inputMode = "tel";
+        // input.inputMode = "tel";
 
         // Convert input to lowercase
         input.addEventListener('input', function(e) {
             this.value = this.value.toLowerCase();
         });
 
-        callButton.addEventListener("click", function() {
-            if (input.value != "") {
-                makeCall({contact: input.value, id: input.value});
-            } else {
-                setTimeout(() => {
-                    callButton.blur();
-                }, 200);
+        // callButton.addEventListener("click", function() {
+        //     if (input.value === ""){
+        //         return
+        //     }
+        //     makeCall({to: input.value});
+        // });
+
+        messageButton.addEventListener("click", function() {
+            if (input.value === ""){
+                return
             }
+            openChat(input.value);
+        })
+
+        domainButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                input.value += this.textContent.toLowerCase();
+            });
         });
 
-        contactsButton.addEventListener("click", function() {
-            controller.contactPicker();
-            contactsButton.blur();
-        });
+        // keyboardToggle.addEventListener("change", function() {
+        //     if (this.checked) {
+        //         input.inputMode = "text";
+        //         buttonContainer.style.display = "flex";
+        //     } else {
+        //         input.inputMode = "tel";
+        //         buttonContainer.style.display = "none";
+        //     }
+        // });
 
         window.addEventListener('message', (event) => {
-            if (event.data.action == 'call') {
-                makeCall(event.data.body);
+            switch (event.data.action) {
+                case 'call':
+                    makeCall(event.data.body);
+                    break;
+                    
+                case 'chat':
+                    openChat(event.data.body.sessionId);
+                    break;
+
+                case 'closeChat':
+                    closeChat();
+                    break;
             }
+        });
+        
+        window.addEventListener('popstate', function(event) {
+            console.log("back button pressed");
+            closeChat();
         });
 
-        channel.addEventListener('message', (event) => {
-            try {
-                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                console.log("received data: "+event.data)
-                if (data.injectRemoteId !== undefined) input.value = (data.injectRemoteId);
-            } catch (error) {
-                console.error("Error parsing message data:", error);
-            }
-        });
+        function openChat(sessionId) {
+            chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" class="chat-iframe" style="width:100%;height:100%;border:none;"></iframe>`;
+            document.querySelector('.container').classList.add('slide-left');
+            chatContainer.classList.add('slide-left');
+            history.pushState({page: 'chat'}, '', 'chat');
+            //controller.displayBackButton(true);
+        }
+
+        function closeChat() {
+            document.querySelector('.container').classList.remove('slide-left');
+            chatContainer.classList.remove('slide-left');
+            setTimeout(() => {
+                chatContainer.innerHTML = '';
+            }, 300); // Clear chat container after animation
+            //controller.displayBackButton(false);
+        }
 
         function makeCall(jsonData) {
             if (jsonData != null) {
-                callButton.blur();
-
-                const modalOverlay = document.createElement('div');
-                modalOverlay.classList.add('modal-overlay');
-
-                const modalContent = document.createElement('div');
-                modalContent.classList.add('modal-content');
-
-                const message = document.createElement('p');
-                message.textContent = `Attempting to call ${jsonData.contact}`;
-
-                modalContent.appendChild(message);
-                modalOverlay.appendChild(modalContent);
-                document.body.appendChild(modalOverlay);
-
-                controller.call(jsonData.id);
+                const connectRequest = {
+                    action: "call-attempt",
+                    body: jsonData
+                };
+                console.log(window.parent)
+                window.parent.postMessage(connectRequest, '*');
             }
         }
+
     </script>
 </body>
 </html>
