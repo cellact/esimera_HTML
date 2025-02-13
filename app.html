@@ -61,25 +61,25 @@
             //    };
                 break;
             case 'CALL':
-                screenFrame.src = "inCall.html?to=" + encodeURIComponent(remoteId);
+                screenFrame.src = "incall.html?to=" + encodeURIComponent(remoteId);
                 break;
             case 'RING':
                 screenFrame.src = "ringing.html?to=" + encodeURIComponent(remoteId);
                 break;
             case 'INCOMING':
-                screenFrame.src = "incomingCall.html?from=" + encodeURIComponent(remoteId);
+                screenFrame.src = "incomingcall.html?from=" + encodeURIComponent(remoteId);
                 break;
         }
 
         class App {
-            constructor(ens, main, ringing, callAttempt, inCall, incomingCall) {
+            constructor(ens, main, ringing, callattempt, incall, incomingcall) {
                 this.ens = ens;
                 this.urls = {
                     "main": main,
                     "ringing": ringing,
-                    "callAttempt": callAttempt,
-                    "inCall": inCall,
-                    "incomingCall": incomingCall
+                    "callattempt": callattempt,
+                    "incall": incall,
+                    "incomingcall": incomingcall
                 };
             }
 
@@ -97,18 +97,18 @@
                     this.setPage('main')
                 }
             }
-            callAttempt(to) {
-                this.setPage('callAttempt', {key:"to",value:to}); // Show call attempt screen
+            callattempt(to) {
+                this.setPage('callattempt', {key:"to",value:to}); // Show call attempt screen
                 controller.call(to);
             }
             callStarted(_with) {
-                this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
+                this.setPage('incall', {key:"to",value:_with}); // Show in-call screen
             }
             callEnded() {
                 //this.setPage('main');
             }
             receivingCall(from) {
-                this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
+                this.setPage('incomingcall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
 
             showError(message) {
@@ -134,11 +134,11 @@
 
         const app = new App(
             "test.eth",
-            "mainScreen.html",
+            "mainscreen.html",
             "ringing.html",
             "callattempt.html",
-            "inCall.html",
-            "incomingCall.html"
+            "incall.html",
+            "incomingcall.html"
         );
 
         window.app = app;
@@ -158,7 +158,7 @@
                     app.ring(body.to);
                     break;
                 case 'call-attempt':
-                    app.callAttempt(body.to);
+                    app.callattempt(body.to);
                     break;
                 case 'call-started':
                     app.callStarted(body.from);
@@ -205,6 +205,6 @@
             }
         });
     </script>
-    <iframe id="error-frame" src="errorWindow.html" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;"></iframe>
+    <iframe id="error-frame" src="errorwindow.html" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;"></iframe>
 </body>
 </html>
