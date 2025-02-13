@@ -213,13 +213,22 @@
         .chat-iframe {
             border-radius: 0;
         }
+        @media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: white;
+    }
+    a {
+        color: #bb86fc;
+    }
+}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="input-container">
             <i class="lucide lucide-phone-call input-icon"></i>
-            <input type="text" placeholder="Enter number or name" id="numberInput">
+            <input type="text" placeholder="Enter number or namee" id="numberInput">
             <button class="action-button message">+</button>
             </div>
         <!-- <div class="toggle-container">
