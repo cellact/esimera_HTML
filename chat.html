@@ -12,16 +12,134 @@
       --secondary-purple: #6a5acd;
       --light-purple: #9370db;
       --dark-purple: #4b0082;
+      --purple-gradient: linear-gradient(135deg, var(--primary-white) 0%, var(--light-purple) 100%);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
     }
-    body {
-      font-family: Arial, sans-serif;
+    * {
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--purple-gradient);
+      background-size: 200% 200%;
+      animation: gradientAnimation 15s ease infinite;
       height: 100vh;
-      background-color: var(--primary-white);
-      overflow-x: hidden;
+      overflow: hidden;
+    }
+    /* Enhanced top bar */
+    #top-bar {
+      background: rgba(106, 90, 205, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    /* Message container */
+    #chat-container {
+      position: fixed;
+      top: 50px; /* Height of top bar */
+      bottom: 60px; /* Height of input area */
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(5px);
+    }
+    /* Message bubbles */
+    .message {
+      max-width: 75%;
+      margin: 2px 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      position: relative;
+      clear: both;
+      word-wrap: break-word;
+    }
+    .message.sent {
+      float: right;
+      background: var(--secondary-purple);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .message.received {
+      float: left;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--dark-purple);
+      border-bottom-left-radius: 4px;
+    }
+    .message.animate {
+      animation: messageAppear 0.3s ease-out;
+    }
+    @keyframes messageAppear {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Input area */
+    .message-input {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    #message-text {
+      flex: 1;
+      height: 40px;
+      padding: 8px 16px;
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      font-size: 16px;
+      background: white;
+      outline: none;
+    }
+    #send-button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: var(--secondary-purple);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    #send-button i {
+      font-size: 20px;
+
+    }
+    /* Scrollbar styling */
+    #chat-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    #chat-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #chat-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+    /* Gradient animation */
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
     /* Fixed top bar with no rounded corners */
     #top-bar {
@@ -37,10 +155,6 @@
       border-radius: 0;
       padding: 0 10px;
       z-index: 1000;
-    }
-
-    button {
-      -webkit-tap-highlight-color: transparent;
     }
     /* Back button styling */
     #back-button {
@@ -70,70 +184,18 @@
       cursor: pointer;
       outline: none;
     }
-    /* Chat container with margin-top matching the fixed top bar */
-    #chat-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-      margin-top: 50px; /* Equal to the top bar height */
-      margin-bottom: 60px;
-    }
-    .message {
-      max-width: 70%;
-      word-wrap: break-word;
-      position: relative;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      display: inline-block;
-      clear: both;
-    }
-    .message.sent {
-      float: right;
-      padding-right: 40px;
-      border: var(--light-purple) 2px solid;
-      color: black;
-    }
-    .message.received {
-      background-color: var(--light-purple);
-      float: left;
-      padding-right: 40px;
-      color: white;
-    }
-    .message-input {
-      display: flex;
-      padding: 10px;
-      background-color: #f0f0f0;
-      border-top: 1px solid #ccc;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 40px;
-    }
-    #message-text {
-      flex: 1;
-      padding: 5px 10px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      margin-right: 10px;
-      font-size: 16px;
-    }
-    #send-button {
-      background-color: var(--secondary-purple);
-      color: white;
-      border: none;
-      padding: 5px 15px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 14px;
-    }
     .date-separator {
       text-align: center;
-      margin: 20px 0;
-      color: #888;
-      font-size: 12px;
+      margin: 16px 0;
+      position: relative;
       clear: both;
+    }
+    .date-separator span {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--dark-purple);
     }
     .message-author {
       font-weight: bold;
@@ -142,31 +204,101 @@
       color: black;
     }
     .message-content {
-      margin-bottom: 15px;
-      font-size: 14px;
+      margin-right: 75px;  /* Increased from 65px to 75px to create more horizontal space */
+      font-size: 15px;
+      line-height: 1.4;
     }
     .message-footer {
       position: absolute;
-      bottom: 3px;
-      right: 7px;
+      bottom: 8px;
+      right: 12px;
       display: flex;
       align-items: center;
-      gap: 5px;
-      white-space: nowrap;
+      gap: 4px;
     }
     .message-time {
       font-size: 11px;
-      color: #888;
+      color: rgba(0, 0, 0, 0.5);
+    }
+    .message.sent .message-time {
+      color: rgba(255, 255, 255, 0.7);
     }
     .message-status-icon {
-      font-size: 12px;
-      color: #888;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
     }
     @media (max-width: 600px) {
       .message {
         max-width: 80%;
         min-width: 30px;
       }
+    }
+    .system-message {
+      text-align: center;
+      padding: 8px 0;
+      position: relative;
+      display: block;
+      clear: both;
+      overflow: hidden;
+    }
+    .system-message span {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--dark-purple);
+    }
+    .system-message-time {
+      font-size: 11px;
+      color: rgba(0, 0, 0, 0.5);
+      margin-top: 4px;
+    }
+    @media (prefers-color-scheme: dark) {
+      #top-bar {            
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+
+      }
+      #chat-container {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 0.8);
+      }
+      .message-input {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      #send-button {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+      .system-message-time {
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+    
+    /* Spacing between different message types */
+    .message + .system-message,
+    .system-message + .message {
+      margin-top: 8px;
+    }
+
+    /* Add a wrapper div for system message content */
+    .system-message-content {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--dark-purple);
+    }
+
+    /* Add new specific rule for system message timestamp spacing */
+    .system-message-time + .message,
+    .system-message-time + .system-message {
+      margin-top: 4px;  /* Reduced margin after timestamp */
     }
   </style>
 </head>
@@ -186,7 +318,9 @@
   <div id="chat-container"></div>
   <div class="message-input">
     <input type="text" id="message-text" placeholder="Type a message..." />
-    <button id="send-button">Send</button>
+    <button id="send-button">
+        <i class="material-icons">send</i>
+    </button>
   </div>
 
   <script>
@@ -199,7 +333,7 @@
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
 
-    controller.getMessages(sessionId, 10);
+    controller.getMessages(sessionId, 20, "");
 
     window.addEventListener('popstate', function(event) {
         console.log("back button pressed");
@@ -218,22 +352,115 @@
 
     let lastDisplayedDate = null;
     let lastAuthor = null;
+    let hasMoreMessages = true;
 
-    function addMessage(content, author, time, type = 'text', status = null, messageId = null) {
+    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false) {
       const currentDate = formatDate(time);
-      if (currentDate !== lastDisplayedDate) {
-        const dateElement = document.createElement('div');
-        dateElement.classList.add('date-separator');
-        dateElement.textContent = currentDate;
-        chatContainer.appendChild(dateElement);
-        lastDisplayedDate = currentDate;
+      
+      // If updating an existing message, handle as before
+      if (messageId !== null) {
+        const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (existingMsg) {
+          const nextElement = existingMsg.nextElementSibling;
+          existingMsg.remove();
+          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false);
+          if (nextElement) {
+            chatContainer.insertBefore(updatedMessage, nextElement);
+          } else {
+            chatContainer.appendChild(updatedMessage);
+          }
+          return;
+        }
       }
 
+      // Create system message element if it's a system message
+      let messageElement;
+      if (author === 'SYSTEM') {
+        messageElement = document.createElement('div');
+        messageElement.classList.add('system-message');
+        messageElement.dataset.time = time;
+        
+        const contentWrapper = document.createElement('div');
+        contentWrapper.classList.add('system-message-content');
+        contentWrapper.textContent = content;
+        messageElement.appendChild(contentWrapper);
+        
+        const systemMessageTime = document.createElement('div');
+        systemMessageTime.classList.add('system-message-time');
+        systemMessageTime.textContent = formatTime(time);
+        messageElement.appendChild(systemMessageTime);
+      } else {
+        messageElement = createMessageElement(content, author, time, type, status, messageId, animate);
+      }
+
+      // For older messages (scrolling up) or chronological insertion
+      if (time < Date.now() - 1000 || author === 'SYSTEM') {
+        // Find the appropriate position for the message
+        let insertPosition = null;
+        const messages = Array.from(chatContainer.children);
+        
+        for (const msg of messages) {
+          const msgTime = parseInt(msg.dataset.time || msg.dataset.messageId);
+          if (msgTime > time) {
+            insertPosition = msg;
+            break;
+          }
+        }
+
+        // Add date separator if needed
+        if (currentDate !== lastDisplayedDate || !lastDisplayedDate) {
+          const dateElement = document.createElement('div');
+          dateElement.classList.add('date-separator');
+          const dateSpan = document.createElement('span');
+          dateSpan.textContent = currentDate;
+          dateElement.appendChild(dateSpan);
+          
+          if (insertPosition) {
+            chatContainer.insertBefore(dateElement, insertPosition);
+          } else {
+            chatContainer.appendChild(dateElement);
+          }
+        }
+        
+        // Insert message at the correct position
+        if (insertPosition) {
+          chatContainer.insertBefore(messageElement, insertPosition);
+        } else {
+          chatContainer.appendChild(messageElement);
+        }
+        
+        lastDisplayedDate = currentDate;
+      } else {
+        // For new messages
+        if (currentDate !== lastDisplayedDate) {
+          const dateElement = document.createElement('div');
+          dateElement.classList.add('date-separator');
+          const dateSpan = document.createElement('span');
+          dateSpan.textContent = currentDate;
+          dateElement.appendChild(dateSpan);
+          chatContainer.appendChild(dateElement);
+          lastDisplayedDate = currentDate;
+        }
+        chatContainer.appendChild(messageElement);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+      
+      if (author !== 'SYSTEM') {
+        lastAuthor = author;
+      }
+    }
+
+    // Helper function to create message elements
+    function createMessageElement(content, author, time, type, status, messageId, animate) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
-
+      if (animate) {
+        messageElement.classList.add('animate');
+      }
+      
       if (messageId !== null) {
         messageElement.dataset.messageId = messageId;
+        messageElement.dataset.time = time; // Store the timestamp for date comparison
       }
 
       if (author === sessionId && author !== lastAuthor) {
@@ -243,17 +470,18 @@
         messageElement.appendChild(authorElement);
       }
 
+      const contentElement = document.createElement('div');
+      contentElement.classList.add('message-content');
+      
       if (type === 'text') {
-        const contentElement = document.createElement('div');
-        contentElement.classList.add('message-content');
         contentElement.textContent = content;
-        messageElement.appendChild(contentElement);
       } else if (type === 'image') {
-        messageElement.classList.add('image-message');
         const img = document.createElement('img');
         img.src = content;
-        messageElement.appendChild(img);
+        contentElement.appendChild(img);
       }
+      
+      messageElement.appendChild(contentElement);
 
       const footerElement = document.createElement('div');
       footerElement.classList.add('message-footer');
@@ -267,30 +495,17 @@
         const statusIcon = document.createElement('span');
         statusIcon.classList.add('material-icons', 'message-status-icon');
         switch (status) {
-          case 0:
-            statusIcon.textContent = 'schedule';
-            break;
-          case 1:
-            statusIcon.textContent = 'done';
-            break;
-          case 2:
-            statusIcon.textContent = 'error';
-            break;
-          case 4:
-            statusIcon.textContent = 'done_all';
-            break;
-          default:
-            statusIcon.textContent = '';
-            break;
+          case 0: statusIcon.textContent = 'schedule'; break;
+          case 1: statusIcon.textContent = 'done'; break;
+          case 2: statusIcon.textContent = 'error'; break;
+          case 4: statusIcon.textContent = 'done_all'; break;
+          default: statusIcon.textContent = ''; break;
         }
         footerElement.appendChild(statusIcon);
       }
 
       messageElement.appendChild(footerElement);
-      chatContainer.appendChild(messageElement);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      lastAuthor = author;
+      return messageElement;
     }
 
     // Set the chat title
@@ -304,6 +519,10 @@
       };
       window.parent.parent.postMessage(connectRequest, '*');
     });
+
+    function closeChat() {
+        window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
+    }
 
     document.getElementById("back-button").addEventListener("click", () => {
         window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
@@ -324,6 +543,44 @@
       }
     });
 
+    // Add scroll event listener for infinite scrolling
+    chatContainer.addEventListener('scroll', () => {
+      if (chatContainer.scrollTop === 0 && hasMoreMessages) {
+        const messages = document.querySelectorAll('[data-message-id]');
+        if (messages.length > 0) {
+          const oldestMessage = messages[0];
+          const oldestMessageId = oldestMessage.dataset.messageId;
+          if (oldestMessageId) {
+            console.log("Fetching older messages with ID:", oldestMessageId);
+            controller.getMessages(sessionId, 20, oldestMessageId);
+          }
+        }
+      }
+    });
+
+    function updateMessage(messageId, content, status) {
+        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (messageElement) {
+            // Update the message content
+            const contentElement = messageElement.querySelector('.message-content');
+            if (contentElement) {
+                contentElement.textContent = content;
+            }
+            
+            // Update the status icon if it exists
+            const statusIcon = messageElement.querySelector('.message-status-icon');
+            if (statusIcon) {
+                switch (status) {
+                    case 0: statusIcon.textContent = 'schedule'; break;
+                    case 1: statusIcon.textContent = 'done'; break;
+                    case 2: statusIcon.textContent = 'error'; break;
+                    case 4: statusIcon.textContent = 'done_all'; break;
+                    default: statusIcon.textContent = ''; break;
+                }
+            }
+        }
+    }
+
     channel.addEventListener('message', (event) => {
       try {
         const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
@@ -331,30 +588,61 @@
           console.log("Received single message data:", data.message);
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
-            addMessage(content, author, time, "text", msgStatus, messageId);
+            addMessage(content, author, time, "text", msgStatus, messageId, true);
+            controller.updateSessionTimestamp(sessionId);
           }
         } else if (data.messages) {
-          data.messages.forEach(msg => {
+          console.log("Received multiple messages data:", data.messages);
+          
+          // If we receive an empty messages array, disable infinite scrolling
+          if (!data.messages || data.messages.length === 0) {
+            hasMoreMessages = false;
+            return;
+          }
+
+          const scrollHeightBefore = chatContainer.scrollHeight;
+          
+          // Sort messages by time in reverse order for older messages
+          const sortedMessages = [...data.messages].sort((a, b) => b[1] - a[1]);
+          
+          sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
             if (msgSessionId === sessionId) {
-              addMessage(content, author, time, "text", msgStatus, messageId);
+              addMessage(content, author, time, "text", msgStatus, messageId, false);
             }
           });
+
+          // If these are older messages (loaded from scrolling up)
+          if (data.messages[0][1] < Date.now() - 1000) {
+            // Maintain scroll position
+            const scrollHeightDiff = chatContainer.scrollHeight - scrollHeightBefore;
+            chatContainer.scrollTop = scrollHeightDiff;
+          } else {
+            // For new messages, scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          }
+          
+          controller.updateSessionTimestamp(sessionId);
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.updatedMessage;
           if (msgSessionId === sessionId) {
-            const existingMsgElement = document.querySelector(`[data-message-id="${messageId}"]`);
-            if (existingMsgElement) {
-              existingMsgElement.remove();
-            }
-            addMessage(content, author, time, "text", msgStatus, messageId);
+            updateMessage(messageId, content, msgStatus);
           }
         }
       } catch (error) {
         console.error("Error processing message data:", error);
       }
     });
+
+    window.onload = function() {
+        // Ensure the chat container is properly sized and positioned before animation starts
+        chatContainer.style.opacity = '1';
+        // Scroll to bottom on load
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        // Signal to parent that chat is ready
+        window.parent.postMessage({ action: 'chatReady' }, '*');
+    };
   </script>
 </body>
 </html>

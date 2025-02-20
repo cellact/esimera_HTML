@@ -9,11 +9,12 @@
         body, html {
             margin: 0;
             padding: 0;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Poppins', sans-serif;
             height: 100%;
             background-color: white;
             user-select: none;
             -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            overflow: hidden;
         }
         :root {
             --primary-white: #ffffff;
@@ -21,60 +22,98 @@
             --light-purple: #9370db;
             --dark-purple: #4b0082;
             --transparent-purple: #9470db69;
+            --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
+            --glass-effect: rgba(255, 255, 255, 0.15);
+        }
+        body {
+            background: var(--purple-gradient);
+            background-size: 200% 200%;
+            animation: gradientAnimation 15s ease infinite;
+            color: white;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
         .container {
-            display: flex;
-            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
             height: 100%;
-            padding: 20px;
-            box-sizing: border-box;
+            max-width: 400px;
+            animation: fadeIn 0.3s ease-out;
         }
         .call-info {
             text-align: center;
-            flex-grow: 1;
+            margin-top: 15vh;
+            animation: slideDown 0.3s ease-out;
         }
         .phone-number {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            margin-bottom: 15px;
+            animation: slideDown 0.3s ease-out;
+            max-width: 90vw;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0 auto;
+            padding: 0 20px;
         }
         .call-duration {
-            font-size: 16px;
-            color: #555;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            animation: slideDown 0.4s ease-out;
         }
         .button-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            flex-grow: 1;
-            z-index: 2;
+            position: absolute;
+            bottom: 5vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
         }
         .button-row {
             display: flex;
             justify-content: space-around;
-            width: 100%;
-            margin-bottom: 20px;
-            z-index: 2;
+            margin-bottom: 30px;
+            gap: 20px;
+            padding: 0 20px;
+            margin: 0 auto 30px;
         }
         .call-button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: none;
+            background: var(--glass-effect);
+            backdrop-filter: blur(5px);
             border: none;
-            color: #333;
-            font-size: 12px;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.3s ease-out;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            position: relative;
+        }
+        .call-button:hover {
+            transform: scale(1.05);
+        }
+        .call-button:active {
+            transform: scale(0.95);
+        }
+        .call-button.end-call {
+            background: #ff3b30;
+        }
+        .call-button.active {
+            background: var(--secondary-purple);
         }
         .call-button .material-icons {
-            font-size: 34px;
-            background-color: var(--light-purple);
+            font-size: 24px;
             color: var(--primary-white);
-            border-radius: 50%;
-            padding: 12px;
-            margin-bottom: 5px;
         }
         .end-call-button {
-            background-color: #ff0000;
+            background-color: #ff3b30;
             border: none;
             border-radius: 50%;
             width: 70px;
@@ -82,7 +121,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin: 0 auto;
+            animation: scaleIn 0.3s ease-out;
+            transition: transform 0.2s ease;
+        }
+        .end-call-button:hover {
+            transform: scale(1.05);
         }
         .end-call-button .material-icons {
             color: white;
@@ -104,17 +148,21 @@
         }
         #dialerContainer {
             position: absolute;
-            bottom: 200px;
+            bottom: 170px;
             left: 0;
             right: 0;
             background-color: white;
             border-radius: 20px;
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-            transform: translateY(20px);
+            margin: 0 auto;
+            max-width: 300px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(50px);
             opacity: 0;
             pointer-events: none;
             z-index: 1;
             padding: 0;
+            height: 320px;
+            background: transparent;
         }
         #dialerContainer.open {
             transform: translateY(0);
@@ -123,13 +171,16 @@
         }
         #dialerFrame {
             width: 100%;
-            height: 300px;
+            height: 100%;
             border: none;
+            border-radius: 20px;
+            background: transparent;
         }
         #topRow {
             display: flex;
             justify-content: center;
             width: 100%;
+            max-width: 300px;
             margin-bottom: 20px;
             transition: transform 0.3s ease-out, opacity 0.3s ease-out;
             transform: translateY(20px);
@@ -143,11 +194,25 @@
         }
         #audioDevicesDropdown {
             position: absolute;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            bottom: 250px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            width: 280px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             z-index: 1000;
+        }
+
+        #audioDevicesDropdown.open {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         #deviceList {
@@ -157,18 +222,42 @@
         }
 
         #deviceList li {
-            padding: 10px;
+            padding: 15px 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
+            color: white;
+            transition: background-color 0.2s ease;
+            border-radius: 15px;
+            margin: 5px 0;
         }
 
         #deviceList li:hover {
-            background-color: #f0f0f0;
+            background: var(--glass-effect);
         }
 
-        #deviceList .material-symbols-outlined {
-            margin-right: 10px;
+        #deviceList li.active {
+            background: var(--secondary-purple);
+        }
+
+        #deviceList .material-icons {
+            margin-right: 15px;
+            font-size: 24px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -186,7 +275,6 @@
             <div id="topRow">
                 <button class="call-button" id="holdButton">
                     <i class="material-icons">pause</i>
-                    Hold
                 </button>
             </div>
             <div id="dialerContainer">
@@ -195,27 +283,23 @@
             <div class="button-row">
                 <button class="call-button" id="dialerButton">
                     <i class="material-icons">dialpad</i>
-                    Keypad
                 </button>
                 <button class="call-button" id="muteButton">
                     <i class="material-icons">mic</i>
-                    Mute
                 </button>
                 <button class="call-button" id="speakerButton">
                     <i class="material-icons">volume_up</i>
-                    Speaker
                 </button>
-                <div id="audioDevicesDropdown" style="display: none;">
-                    <ul id="deviceList"></ul>
-                </div>
                 <button class="call-button" id="moreButton">
                     <i class="material-icons">more_vert</i>
-                    More
                 </button>
             </div>
             <button class="end-call-button" id="hangUpButton">
                 <i class="material-icons">call_end</i>
             </button>
+        </div>
+        <div id="audioDevicesDropdown">
+            <ul id="deviceList"></ul>
         </div>
     </div>
 
@@ -305,7 +389,7 @@
         }
 
         speakerButton.addEventListener("click", () => {
-            audioDevicesDropdown.style.display = audioDevicesDropdown.style.display === "none" ? "block" : "none";
+            audioDevicesDropdown.classList.toggle('open');
         });
 
         function updateAudioDevices(devices) {
@@ -314,12 +398,14 @@
             for (const [key, value] of Object.entries(devices)) {
                 const li = document.createElement("li");
                 li.innerHTML = `
-                    <span class="material-icons">${getIconForDevice(value)}</span>
+                    <i class="material-icons">${getIconForDevice(value)}</i>
                     <span>${value}</span>
                 `;
                 li.addEventListener("click", () => {
                     controller.changeAudioDevice(callId, parseInt(key));
-                    audioDevicesDropdown.style.display = "none";
+                    audioDevicesDropdown.classList.remove('open');
+                    deviceList.querySelectorAll('li').forEach(item => item.classList.remove('active'));
+                    li.classList.add('active');
                 });
                 deviceList.appendChild(li);
             }
@@ -394,6 +480,13 @@
 
         controller.getActiveCalls();
         controller.getAudioDevices();
+
+        document.addEventListener('click', (event) => {
+            if (!audioDevicesDropdown.contains(event.target) && 
+                !speakerButton.contains(event.target)) {
+                audioDevicesDropdown.classList.remove('open');
+            }
+        });
     </script>
 </body>
 </html>

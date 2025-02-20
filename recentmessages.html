@@ -5,70 +5,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reusable Recent Message Session Component</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        :root {
+            --secondary-purple: #6a5acd;
+        }
+
         .recent-messages {
             margin: 0;
             padding: 0;
             list-style: none;
-            webkit-user-select: none; 
             user-select: none;
+            -webkit-user-select: none;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            /* border: 3px solid rgba(0,0,0,1); */
         }
+        
         .message-entry {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            background: white;
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+            align-items: center;
+            gap: 15px;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none; /* Prevents callout on long press */
+        }
+
+        .message-entry:active {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .profile-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        
+        .message-details {
+            flex: 1;
+            min-width: 0;
+            padding-right: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 48px; /* Match profile circle height */
+            padding: 4px 0; /* Add vertical padding */
+        }
+        
+        .message-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 0; /* Remove margin bottom */
+            width: 100%;
         }
-        .message-details {
-            flex-grow: 1;
+        
+        .header-left {
+            display: flex;
+            align-items: center;
         }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* Push to right */
+        }
+        
+        .message-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
         .contact-name {
             font-size: 16px;
-            color: #333;
+            font-weight: 500;
+            color: #202020;
         }
+        
         .message-text {
-            font-size: 12px;
-            color: #999;
+            font-size: 14px;
+            color: #667781;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            padding-right: 8px;
         }
+        
         .message-time {
             font-size: 12px;
-            color: #999;
+            color: #667781;
+            white-space: nowrap;
         }
-        .message-icon {
-            font-family: 'Material Symbols Outlined';
-            font-size: 24px;
-        }
+        
         .unread-bubble {
-            background-color: rgb(115, 0, 113);
+            background-color: #6a5acd;
+            background-color: var(--secondary-purple);
             color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
+            font-size: 12px;
+            font-weight: 500;
             border-radius: 50%;
-            padding: 5px;
             width: 20px;
             height: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: absolute;
-            top: 5px; /* Adjust based on your layout */
-            right: 5px; /* Adjust based on your layout */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
-        .profile-circle {
-            width: 40px; /* Adjust size as needed */
-            height: 40px;
-            border-radius: 50%;
+        
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #2d1f3d 0%, #1a1a2e 100%);
+            }
+            .message-entry {
+                border-bottom: 1px solid black;
+                background: var(--dark-purple);
+            }
+            .contact-name {
+                color: white;
+            }
+            .message-text {
+                color: white;
+            }
+            .message-time {
+                color: white;
+            }
+            .call-button {
+                color: white;
+                border-color: white;
+            }
+            
+            .call-button:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* Update call button styles */
+        .call-button {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 10px; /* Adjust spacing */
-            color: white; /* Text color for the initial */
-            font-size: 16px; /* Adjust font size */
-            font-weight: bold;
-            text-transform: uppercase;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--secondary-purple);
+            background: transparent;
+            cursor: pointer;
+            color: var(--secondary-purple);
+            margin-left: 5px;
+            padding: 8px;
+            flex-shrink: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            outline: none;
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .call-button:hover {
+            background-color: rgba(106, 90, 205, 0.1);
+        }
+
+        .call-button:active {
+            transform: scale(0.9);
+            background-color: rgba(106, 90, 205, 0.2);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .call-button:active {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
     </style>
 </head>
 <body>
@@ -77,6 +210,29 @@
     <script>
 
         const channel = new BroadcastChannel('myChannel');
+        function hashStringToColor(str) {
+            // Generate a hash of the string
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            // Convert hash to RGB values
+            const r = (hash & 0xFF0000) >> 16;
+            const g = (hash & 0x00FF00) >> 8;
+            const b = hash & 0x0000FF;
+            
+            // Ensure colors aren't too dark or too light
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            if (brightness < 128) {
+                return `hsl(${hash % 360}, 70%, 60%)`; // Lighter version
+            } else if (brightness > 200) {
+                return `hsl(${hash % 360}, 70%, 45%)`; // Darker version
+            }
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
         class RecentMessagesComponent {
             constructor(containerId) {
                 this.container = document.getElementById(containerId);
@@ -105,7 +261,7 @@
             }
 
             updateRecentMessages(recentMessages) {
-                this.container.innerHTML = ""; // Clear existing logs
+                this.container.innerHTML = "";
                 recentMessages.forEach(msg => {
                     const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
 
@@ -114,40 +270,60 @@
                     const isToday = messageDate.toDateString() === today.toDateString();
                     const timeOrDate = isToday ? messageDate.toLocaleTimeString([], { timeStyle: 'short' }) : messageDate.toLocaleDateString();
                     const iconSymbol = 'chat';
-                    const name = author === msgSessionId ? "" : "You: ";
+                    const name = (author === msgSessionId || author === "SYSTEM") ? "" : "You: ";
                     const messageinfo = name + content + ' ';
 
-                    // Generate a random color
-                    const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+                    // Replace random color with consistent hash-based color
+                    const profileColor = hashStringToColor(msgSessionId);
 
                     const li = document.createElement('li');
                     li.className = "message-entry";
 
                     li.innerHTML = `
-                        <div class="profile-circle" style="background-color: ${randomColor};">
+                        <div class="profile-circle" style="background-color: ${profileColor};">
                             <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
                         </div>
                         <div class="message-details">
-                            <div class="contact-name">${formatName(msgSessionId)}</div>
-                            <div class="message-text">${messageinfo}</div>
+                            <div class="message-header">
+                                <div class="header-left">
+                                    <span class="contact-name">${formatName(msgSessionId)}</span>
+                                </div>
+                                <div class="header-right">
+                                    ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-text">${messageinfo}</div>
+                                <span class="message-time">${timeOrDate}</span>
+                            </div>
                         </div>
-                        <p style="margin-right:3px">${timeOrDate}</p>
-                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
-                        <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
+                        <button class="call-button">
+                            <i class="material-icons">call</i>
+                        </button>`;
+
+                    // Add click handler for call button
+                    const callButton = li.querySelector('.call-button');
+                    callButton.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent triggering the chat open
+                        window.parent.postMessage({ 
+                            action: 'call', 
+                            body: { to: msgSessionId }
+                        }, '*');
+                    });
 
                     li.addEventListener('click', () => {
                         window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
-                        this.controller.chatOpened(msgSessionId);
                     });
 
                     document.querySelector("#recent-messages").appendChild(li);
                 });
-            }
 
+            }
         }
 
-        const com = new RecentMessagesComponent('recent-messages');
 
+        const com = new RecentMessagesComponent('recent-messages');
+        // com.updateRecentMessages([[1, 2, "test", "test", "test", 1]]);
 function formatName(name) {
     if (name.length > 25) {
         return name.substring(0, 22) + "...";
