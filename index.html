@@ -228,6 +228,29 @@
                 };
                 this.sendMessageToNativeApp(deleteSessionRequest);
             }
+
+            imagePicker() {
+                const request = {
+                    action: "image-picker",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendImageMessage(to, imageUri, caption) {
+                const request = {
+                    action: "send-image-message",
+                    body: { localId: this.localId, pid: this.pid, to: to, imageUri: imageUri, content: caption }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            openContacts() {
+                const request = {
+                    action: "choose-contact",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>

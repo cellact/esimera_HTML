@@ -9,12 +9,12 @@
   <style>
     :root {
       --primary-white: #ffffff;
-      --secondary-purple: #6a5acd;
+      --secondary-purple: rgb(115, 66, 160);
       --light-purple: #9370db;
       --dark-purple: #4b0082;
       --purple-gradient: linear-gradient(135deg, var(--primary-white) 0%, var(--light-purple) 100%);
       --glass-bg: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-border: rgba(200, 200, 200, 0.7);
     }
     * {
       margin: 0;
@@ -24,7 +24,7 @@
     }
     body {
       font-family: 'Poppins', sans-serif;
-      background: var(--purple-gradient);
+      /* background: var(--purple-gradient); */
       background-size: 200% 200%;
       animation: gradientAnimation 15s ease infinite;
       height: 100vh;
@@ -67,6 +67,7 @@
     .message.received {
       float: left;
       background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(200, 200, 200, 0.8);
       color: var(--dark-purple);
       border-bottom-left-radius: 4px;
     }
@@ -261,7 +262,7 @@
       }
       #chat-container {
         background-color: var(--purple-gradient);
-        background: rgba(20, 20, 30, 0.8);
+        background: rgb(23, 23, 23);
       }
       .message-input {
         background-color: var(--purple-gradient);
@@ -288,7 +289,7 @@
     /* Add a wrapper div for system message content */
     .system-message-content {
       display: inline-block;
-      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(200, 200, 200, 0.5);
       padding: 6px 12px;
       border-radius: 12px;
       font-size: 12px;
@@ -299,6 +300,27 @@
     .system-message-time + .message,
     .system-message-time + .system-message {
       margin-top: 4px;  /* Reduced margin after timestamp */
+    }
+
+    /* Add this to the style section */
+
+
+    @media (prefers-color-scheme: dark) {
+      #image-button {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+      .system-message-content {
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .date-separator span {
+        color: rgba(255, 255, 255, 0.9);
+        background: none;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+
+
+      }
     }
   </style>
 </head>
@@ -319,7 +341,7 @@
   <div class="message-input">
     <input type="text" id="message-text" placeholder="Type a message..." />
     <button id="send-button">
-        <i class="material-icons">send</i>
+      <i class="material-icons">send</i>
     </button>
   </div>
 
@@ -332,7 +354,6 @@
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
-
     controller.getMessages(sessionId, 20, "");
 
     window.addEventListener('popstate', function(event) {
@@ -523,6 +544,9 @@
     function closeChat() {
         window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
     }
+    // addMessage("Encryption key received", "SYSTEM", Date.now(), "text", null, null, false);
+    // addMessage("Hey girlll", "testing", Date.now(), "text", null, null, false);
+    // addMessage("Wassup", "dukedennis.eth", Date.now(), "text", null, null, false);
 
     document.getElementById("back-button").addEventListener("click", () => {
         window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
@@ -542,6 +566,7 @@
         sendButton.click();
       }
     });
+
 
     // Add scroll event listener for infinite scrolling
     chatContainer.addEventListener('scroll', () => {
@@ -583,6 +608,7 @@
 
     channel.addEventListener('message', (event) => {
       try {
+        console.log("Received channel message:", event.data);
         const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
         if (data.message) {
           console.log("Received single message data:", data.message);
@@ -629,9 +655,46 @@
           if (msgSessionId === sessionId) {
             updateMessage(messageId, content, msgStatus);
           }
+        } else if (data.imagePickerResult) {
+          console.log("Received imagePickerResult data:", data.imagePickerResult);
+          // Create iframe and show image directly
+          const iframe = document.createElement('iframe');
+          iframe.style.position = 'fixed';
+          iframe.style.top = '0';
+          iframe.style.left = '0';
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          iframe.style.border = 'none';
+          iframe.style.zIndex = '1000';
+          
+          // Pass both the image data and URI to the imagepicker
+          const params = new URLSearchParams();
+          params.set('imageData', data.imagePickerResult);
+          params.set('imageUri', data.imageUri || '');
+          iframe.src = 'imagepicker.html#' + encodeURIComponent(params.toString());
+          
+          document.body.appendChild(iframe);
         }
       } catch (error) {
         console.error("Error processing message data:", error);
+      }
+    });
+
+    // Update message handler for iframe communications
+    window.addEventListener('message', (event) => {
+      if (event.data.action === 'closeImagePicker') {
+        const iframe = document.querySelector('iframe');
+        if (iframe) iframe.remove();
+      } else if (event.data.action === 'sendImage') {
+        const iframe = document.querySelector('iframe');
+        if (iframe) iframe.remove();
+        
+        // Call controller method with all required parameters
+        controller.sendImageMessage(
+          sessionId,
+          event.data.body.imageUri,
+          event.data.body.caption || ''
+        );
       }
     });
 
