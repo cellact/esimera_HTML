@@ -279,6 +279,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const remoteId = urlParams.get('remoteId');
 
+        const channel = new BroadcastChannel('myChannel');
+
         if(remoteId != null) {
             console.log("opening chat" + remoteId);
             openChat(remoteId);
@@ -309,7 +311,7 @@
         });
 
         contactsButton.addEventListener("click", function() {
-            openContacts();
+            controller.contactPicker();
         });
 
         window.addEventListener('message', (event) => {
@@ -334,6 +336,16 @@
         window.addEventListener('popstate', function(event) {
             console.log("back button pressed");
             closeChat();
+        });
+
+        channel.addEventListener('message', (event) => {
+            try {
+                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                console.log("received data: "+event.data)
+                if (data.injectRemoteId !== undefined) input.value = (data.injectRemoteId);
+            } catch (error) {
+                console.error("Error parsing message data:", error);
+            }
         });
 
         function openChat(sessionId) {
@@ -387,13 +399,6 @@
                 };
                 window.parent.postMessage(connectRequest, '*');
             }
-        }
-        function openContacts() {
-            const connectRequest = {
-                action: "choose-contact",
-                body: {}
-            }
-            window.parent.postMessage(connectRequest, '*');
         }
     </script>
 </body>

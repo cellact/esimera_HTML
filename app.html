@@ -205,11 +205,8 @@
                 case 'new-message':
                     app.dataFetched(body);
                     break;
-                case 'choose-contact':
-                    app.openContacts();
-                    break;
-                case "fill-input":
-                    app.fillInput(body);
+                case 'inject-remote-id':
+                    app.dataFetched(body);
                     break;
                 default:
                     console.log('Unknown action:', action);
