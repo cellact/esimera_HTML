@@ -325,6 +325,9 @@
                 case 'closeChat':
                     closeChat();
                     break;
+                case 'fillInput':
+                    fillInput(event.data.body.value);
+                    break;
             }
         });
         
@@ -370,7 +373,12 @@
                 chatContainer.innerHTML = '';
             }, 300);
         }
-
+        function fillInput(value) {
+            const input = document.getElementById("numberInput");
+            if (input) {
+                input.value = value;
+            }
+        }
         function makeCall(jsonData) {
             if (jsonData != null) {
                 const connectRequest = {
