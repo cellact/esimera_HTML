@@ -27,6 +27,7 @@
             --danger-shadow: rgba(255, 59, 48, 0.3);
             --danger-shadow-active: rgba(255, 59, 48, 0.2);
             --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
+            --ripple-color: rgba(255, 255, 255, 0.6);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -47,7 +48,12 @@
                 --shadow-color-active: rgba(0, 0, 0, 0.7);
                 --danger-shadow: rgba(255, 69, 58, 0.3);
                 --danger-shadow-active: rgba(255, 69, 58, 0.5);
-                --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
+                --glass-effect: rgba(255, 255, 255, 0.1);
+                --purple-gradient: linear-gradient(135deg, 
+                    rgb(138, 93, 180) 0%, 
+                    rgb(94, 59, 136) 50%,
+                    rgb(71, 44, 103) 100%
+                );
             }
         }
         
@@ -112,11 +118,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 30px;
+            margin: 0 auto;
             color: white;
             font-size: 36px;
             font-weight: 500;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
         .ringing-animation {
@@ -124,9 +133,12 @@
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.6);
-            margin: 0 auto;
+            border: 3px solid var(--ripple-color);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             animation: ring 2s ease-out infinite;
+            z-index: 1;
         }
 
         .hang-up-button {
@@ -156,8 +168,14 @@
         }
 
         @keyframes ring {
-            0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
+            0% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(2);
+                opacity: 0;
+            }
         }
 
         @keyframes fadeIn {
@@ -180,14 +198,38 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+
+        @keyframes pulse {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .profile-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="profile-circle">
-            <span id="initial"></span>
+        <div class="profile-container">
+            <div class="profile-circle">
+                <span id="initial"></span>
+            </div>
+            <div class="ringing-animation"></div>
         </div>
-        <div class="ringing-animation"></div>
         <h2>Calling<span id="name"></span></h2>
         <button class="hang-up-button">
             <i class="material-icons">call_end</i>

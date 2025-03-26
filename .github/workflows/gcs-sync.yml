@@ -26,10 +26,10 @@ jobs:
       - name: Sync to GCS
         run: |
           # Sync all files to the bucket
-          gsutil -m rsync -r -x '(^\.git/.*|^\.github/.*|.*\.json$|\.DS_Store)' . gs://ens-v1_0_2
+          gsutil -m rsync -r -x '(^\.git/.*|^\.github/.*|.*\.json$|\.DS_Store)' . gs://ens-v1_0_3
 
       - name: Set Cache-Control headers
         run: |
           # Set the Cache-Control header to cache for 24 hours
-          gsutil -m setmeta -h "Cache-Control: public, max-age=86400" gs://ens-v1_0_2/**
-          # gsutil -m setmeta -h "Cache-Control: no-cache, no-store, must-revalidate" gs://ens-v1_0_2/**
+          gsutil -m setmeta -h "Cache-Control: public, max-age=86400" gs://ens-v1_0_3/**
+          # gsutil -m setmeta -h "Cache-Control: no-cache, no-store, must-revalidate" gs://ens-v1_0_3/**

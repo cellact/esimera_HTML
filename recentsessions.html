@@ -135,6 +135,7 @@
             justify-content: center;
             min-height: 52px;
             padding: 2px 0;
+            margin-right: 8px;
         }
         
         .message-header {
@@ -143,18 +144,20 @@
             align-items: center;
             margin-bottom: 4px;
             width: 100%;
+            gap: 8px;
         }
         
         .header-left {
             display: flex;
             align-items: center;
+            min-width: 0;
+            flex: 1;
         }
         
         .header-right {
             display: flex;
             align-items: center;
-            margin-left: auto;
-            padding-left: 0.5pc;
+            flex-shrink: 0;
         }
         
         .message-content {
@@ -169,6 +172,10 @@
             font-weight: 600;
             color: var(--text-primary);
             letter-spacing: -0.24px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
         
         .message-text {
@@ -363,8 +370,8 @@
                         console.log("Received recent sessions data:", data.recentSessions);
                         this.updateRecentSessions(data.recentSessions);
                     }
-                    else if (data.message) {
-                        this.controller.getRecentSessions(20);
+                    else if (data.message || data.updatedMessage) {
+                        this.controller.getRecentSessions(100);
                     }
                 } catch (error) {
                     console.error("Error parsing message data:", error);
@@ -422,7 +429,7 @@
             updateRecentSessions(recentSessions) {
                 this.container.innerHTML = "";
                 recentSessions.forEach(msg => {
-                    const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
+                    const [messageId, time, author, content, msgSessionId, contact, unreadCount] = msg;
 
                     const messageDate = new Date(time);
                     const today = new Date();
@@ -445,20 +452,22 @@
                     const name = (author === msgSessionId || author === "SYSTEM") ? "" : "You: ";
                     const messageinfo = name + content;
 
-                    // Use consistent hash-based color with purple focus
+                    // Use msgSessionId for color generation but contact for display
                     const profileColor = hashStringToColor(msgSessionId);
+                    const displayName = contact || msgSessionId; // Fallback to msgSessionId if contact is null
+                    const firstLetter = displayName.charAt(0).toUpperCase();
 
                     const li = document.createElement('li');
                     li.className = "message-entry";
 
                     li.innerHTML = `
                         <div class="profile-circle" style="background-color: ${profileColor};">
-                            <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
+                            <span class="profile-initial">${firstLetter}</span>
                         </div>
                         <div class="message-details">
                             <div class="message-header">
                                 <div class="header-left">
-                                    <span class="contact-name">${formatName(msgSessionId)}</span>
+                                    <span class="contact-name">${formatName(displayName)}</span>
                                 </div>
                                 <div class="header-right">
                                     <span class="message-time">${timeOrDate}</span>
@@ -496,7 +505,7 @@
                         if (!this.deleteMode) {
                             window.parent.postMessage({ 
                                 action: 'call', 
-                                body: { to: msgSessionId }
+                                body: { remoteId: msgSessionId, contact: contact }
                             }, '*');
                         }
                     });
@@ -573,8 +582,8 @@
         // ]);
         
         function formatName(name) {
-            if (name.length > 25) {
-                return name.substring(0, 22) + "...";
+            if (name.length > 20) {
+                return name.substring(0, 17) + "...";
             }
             return name;
         }

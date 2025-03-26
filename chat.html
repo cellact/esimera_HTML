@@ -351,9 +351,13 @@
     const channel = new BroadcastChannel('myChannel');
     const sessionId = decodeURIComponent(urlParams.get('sessionId'));
 
+    // Add contact as a property of the window object so we can access it globally
+    window.contactName = '';
+
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
+    controller.getContactName(sessionId);
     controller.getMessages(sessionId, 20, "");
 
     window.addEventListener('popstate', function(event) {
@@ -375,7 +379,7 @@
     let lastAuthor = null;
     let hasMoreMessages = true;
 
-    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false) {
+    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null) {
       const currentDate = formatDate(time);
       
       // If updating an existing message, handle as before
@@ -384,7 +388,7 @@
         if (existingMsg) {
           const nextElement = existingMsg.nextElementSibling;
           existingMsg.remove();
-          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false);
+          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false, contact);
           if (nextElement) {
             chatContainer.insertBefore(updatedMessage, nextElement);
           } else {
@@ -400,6 +404,9 @@
         messageElement = document.createElement('div');
         messageElement.classList.add('system-message');
         messageElement.dataset.time = time;
+        if (messageId !== null) {
+          messageElement.dataset.messageId = messageId;
+        }
         
         const contentWrapper = document.createElement('div');
         contentWrapper.classList.add('system-message-content');
@@ -411,11 +418,11 @@
         systemMessageTime.textContent = formatTime(time);
         messageElement.appendChild(systemMessageTime);
       } else {
-        messageElement = createMessageElement(content, author, time, type, status, messageId, animate);
+        messageElement = createMessageElement(content, author, time, type, status, messageId, animate, contact);
       }
 
       // For older messages (scrolling up) or chronological insertion
-      if (time < Date.now() - 1000 || author === 'SYSTEM') {
+      if (time < Date.now() - 1000) {
         // Find the appropriate position for the message
         let insertPosition = null;
         const messages = Array.from(chatContainer.children);
@@ -452,7 +459,7 @@
         
         lastDisplayedDate = currentDate;
       } else {
-        // For new messages
+        // For new messages (including new system messages)
         if (currentDate !== lastDisplayedDate) {
           const dateElement = document.createElement('div');
           dateElement.classList.add('date-separator');
@@ -472,7 +479,7 @@
     }
 
     // Helper function to create message elements
-    function createMessageElement(content, author, time, type, status, messageId, animate) {
+    function createMessageElement(content, author, time, type, status, messageId, animate, contact) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
       if (animate) {
@@ -481,13 +488,15 @@
       
       if (messageId !== null) {
         messageElement.dataset.messageId = messageId;
-        messageElement.dataset.time = time; // Store the timestamp for date comparison
+        messageElement.dataset.time = time;
       }
 
-      if (author === sessionId && author !== lastAuthor) {
+      // Show contact name for messages FROM the other person (where author is NOT sessionId)
+      // Don't show for system messages or consecutive messages from same author
+      if (author == sessionId && author !== lastAuthor) {
         const authorElement = document.createElement('div');
         authorElement.classList.add('message-author');
-        authorElement.textContent = author;
+        authorElement.textContent = contact || author;
         messageElement.appendChild(authorElement);
       }
 
@@ -534,11 +543,13 @@
 
     // Call button logic
     document.getElementById("call-button").addEventListener("click", () => {
-      const connectRequest = {
-        action: "call-attempt",
-        body: { to: sessionId }
-      };
-      window.parent.parent.postMessage(connectRequest, '*');
+      window.parent.postMessage({ 
+        action: 'call', 
+        body: { 
+          remoteId: sessionId, 
+          contact: window.contactName  // Use global contact
+        }
+      }, '*');
     });
 
     function closeChat() {
@@ -584,23 +595,33 @@
     });
 
     function updateMessage(messageId, content, status) {
-        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-        if (messageElement) {
-            // Update the message content
-            const contentElement = messageElement.querySelector('.message-content');
-            if (contentElement) {
-                contentElement.textContent = content;
-            }
-            
-            // Update the status icon if it exists
-            const statusIcon = messageElement.querySelector('.message-status-icon');
-            if (statusIcon) {
-                switch (status) {
-                    case 0: statusIcon.textContent = 'schedule'; break;
-                    case 1: statusIcon.textContent = 'done'; break;
-                    case 2: statusIcon.textContent = 'error'; break;
-                    case 4: statusIcon.textContent = 'done_all'; break;
-                    default: statusIcon.textContent = ''; break;
+        const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (existingMsg) {
+            if (existingMsg.classList.contains('system-message')) {
+                // Update system message content
+                const contentWrapper = existingMsg.querySelector('.system-message-content');
+                if (contentWrapper) {
+                    contentWrapper.textContent = content;
+                }
+            } else {
+                // Update regular message content
+                const contentElement = existingMsg.querySelector('.message-content');
+                if (contentElement) {
+                    contentElement.textContent = content;
+                }
+                
+                // Update status if it's a sent message
+                if (existingMsg.classList.contains('sent') && status !== null) {
+                    const statusIcon = existingMsg.querySelector('.message-status-icon');
+                    if (statusIcon) {
+                        switch (status) {
+                            case 0: statusIcon.textContent = 'schedule'; break;
+                            case 1: statusIcon.textContent = 'done'; break;
+                            case 2: statusIcon.textContent = 'error'; break;
+                            case 4: statusIcon.textContent = 'done_all'; break;
+                            default: statusIcon.textContent = ''; break;
+                        }
+                    }
                 }
             }
         }
@@ -610,17 +631,23 @@
       try {
         console.log("Received channel message:", event.data);
         const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        
+        if (data.contactName) {
+            const titleElement = document.getElementById('title');
+            titleElement.textContent = data.contactName;
+            window.contactName = data.contactName;  // Update global contact
+        }
+        
         if (data.message) {
           console.log("Received single message data:", data.message);
-          const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
+          const [messageId, time, author, content, msgSessionId, contact, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
-            addMessage(content, author, time, "text", msgStatus, messageId, true);
+            addMessage(content, author, time, "text", msgStatus, messageId, true, contact);
             controller.updateSessionTimestamp(sessionId);
           }
         } else if (data.messages) {
           console.log("Received multiple messages data:", data.messages);
           
-          // If we receive an empty messages array, disable infinite scrolling
           if (!data.messages || data.messages.length === 0) {
             hasMoreMessages = false;
             return;
@@ -628,13 +655,16 @@
 
           const scrollHeightBefore = chatContainer.scrollHeight;
           
-          // Sort messages by time in reverse order for older messages
-          const sortedMessages = [...data.messages].sort((a, b) => b[1] - a[1]);
+          // Sort messages by time in ASCENDING order (oldest first)
+          const sortedMessages = [...data.messages].sort((a, b) => a[1] - b[1]);
+          
+          // Reset lastAuthor before processing the batch of messages
+          lastAuthor = null;
           
           sortedMessages.forEach(msg => {
-            const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
+            const [messageId, time, author, content, msgSessionId, contact, msgStatus] = msg;
             if (msgSessionId === sessionId) {
-              addMessage(content, author, time, "text", msgStatus, messageId, false);
+              addMessage(content, author, time, "text", msgStatus, messageId, false, contact);
             }
           });
 
@@ -651,7 +681,7 @@
           controller.updateSessionTimestamp(sessionId);
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
-          const [messageId, time, author, content, msgSessionId, msgStatus] = data.updatedMessage;
+          const [messageId, time, author, content, msgSessionId, contact, msgStatus] = data.updatedMessage;
           if (msgSessionId === sessionId) {
             updateMessage(messageId, content, msgStatus);
           }
