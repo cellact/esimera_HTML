@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Preview</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Media Preview</title>
+    <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <link rel="stylesheet" href="assets/fonts/system-fonts.css">
     <style>
         :root {
             --secondary-purple: #6a5acd;
@@ -39,18 +40,46 @@
             cursor: pointer;
         }
 
-        #image-container {
+        #media-container {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
         }
 
         #preview-image {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            display: none; /* Hidden by default, shown when needed */
+            background: transparent; /* Ensure transparent background */
+        }
+        
+        #preview-video {
+            max-width: 100%;
+            max-height: 100%;
+            display: none; /* Hidden by default, shown when needed */
+        }
+        
+        #video-play-button {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: none; /* Hidden by default, shown when needed */
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 36px;
+        }
+
+        .material-icons {
+            font-size: 24px;
+            color: white;
         }
 
         #bottom-bar {
@@ -103,8 +132,12 @@
         </button>
     </div>
     
-    <div id="image-container">
-        <img id="preview-image" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+    <div id="media-container">
+        <img id="preview-image" alt="Preview" crossorigin="anonymous">
+        <video id="preview-video" controls></video>
+        <div id="video-play-button">
+            <span class="material-icons">play_arrow</span>
+        </div>
     </div>
     
     <div id="bottom-bar">
@@ -119,17 +152,140 @@
         const sendButton = document.getElementById('send-button');
         const captionInput = document.getElementById('caption-input');
         const previewImage = document.getElementById('preview-image');
+        const previewVideo = document.getElementById('preview-video');
+        const videoPlayButton = document.getElementById('video-play-button');
+        
+        function checkFileType(url) {
+            console.log('Checking file type for URL:', url);
+            
+            // First try to get the extension from the URL
+            const extensionMatch = url.match(/\.([^.]+)$/);
+            if (extensionMatch) {
+                const extension = extensionMatch[1].toLowerCase();
+                console.log('Found extension from URL:', extension);
+                const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+                const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'flv'];
+
+                if (imageExtensions.includes(extension)) {
+                    console.log('Detected as image type');
+                    return { type: 'image', extension };
+                } else if (videoExtensions.includes(extension)) {
+                    console.log('Detected as video type');
+                    return { type: 'video', extension };
+                }
+            }
+
+            // If no extension found or not recognized, try the UUID pattern
+            const uuidMatch = url.match(/([0-9A-Fa-f\-]{36})\.(\w+)$/);
+            if (uuidMatch) {
+                const extension = uuidMatch[2].toLowerCase();
+                console.log('Found extension from UUID pattern:', extension);
+                const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+                const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'flv'];
+
+                if (imageExtensions.includes(extension)) {
+                    console.log('Detected as image type');
+                    return { type: 'image', extension };
+                } else if (videoExtensions.includes(extension)) {
+                    console.log('Detected as video type');
+                    return { type: 'video', extension };
+                }
+            }
+
+            console.log('Could not determine file type');
+            return { type: 'unknown', extension: null };
+        }
 
         // Parse hash parameters
-        const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
+        const hashParams = window.location.hash.slice(1);
+        console.log('Hash params:', hashParams);
+        const hashData = new URLSearchParams(decodeURIComponent(hashParams));
         const imageData = hashData.get('imageData');
-        const imageUri = hashData.get('imageUri');
-
-        // Set image source
-        if (imageData.startsWith('data:')) {
-            previewImage.src = imageData;
+        console.log('Image data URL:', imageData);
+        
+        const fileType = checkFileType(imageData);
+        console.log('File type detected:', fileType);
+        
+        if (fileType.type === 'video') {
+            console.log('Setting up video preview');
+            previewVideo.style.display = 'block';
+            previewVideo.src = imageData;
+            
+            // Add play button overlay
+            videoPlayButton.style.display = 'flex';
+            videoPlayButton.addEventListener('click', () => {
+                if (previewVideo.paused) {
+                    previewVideo.play();
+                    videoPlayButton.style.display = 'none';
+                } else {
+                    previewVideo.pause();
+                }
+            });
+            
+            // Hide play button when video starts playing
+            previewVideo.addEventListener('play', () => {
+                videoPlayButton.style.display = 'none';
+            });
+            
+            // Show play button when video is paused
+            previewVideo.addEventListener('pause', () => {
+                videoPlayButton.style.display = 'flex';
+            });
+            
+            // Hide play button when video is playing
+            previewVideo.addEventListener('playing', () => {
+                videoPlayButton.style.display = 'none';
+            });
         } else {
-            previewImage.src = `data:image/webp;base64,${imageData}`;
+            console.log('Setting up image preview');
+            const img = document.getElementById('preview-image');
+            
+            // Clear any existing src
+            img.removeAttribute('src');
+            
+            // Add all possible error handlers
+            img.onerror = function(e) {
+                console.error('Image load error:', e);
+                console.error('Error event details:', {
+                    type: e.type,
+                    target: e.target,
+                    src: e.target.src,
+                    timestamp: new Date().toISOString()
+                });
+            };
+            
+            img.addEventListener('error', function(e) {
+                console.error('Image load error (addEventListener):', e);
+            }, true);
+            
+            window.addEventListener('error', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    console.error('Global image error:', e);
+                }
+            }, true);
+            
+            img.addEventListener('load', function() {
+                console.log('Image loaded successfully');
+                console.log('Image dimensions:', this.naturalWidth, 'x', this.naturalHeight);
+                console.log('Image complete:', this.complete);
+                console.log('Current src:', this.src);
+            });
+
+            // Show the image container first
+            img.style.display = 'block';
+            
+            // Try to load the image
+            console.log('Setting image source to:', imageData);
+            
+            // Force a browser reflow before setting src
+            void img.offsetWidth;
+            
+            // Set the source
+            img.src = imageData;
+            
+            // Double check the source was set
+            console.log('Image source after setting:', img.src);
+            console.log('Image complete status:', img.complete);
         }
 
         // Handle back button
@@ -143,8 +299,8 @@
             window.parent.postMessage({
                 action: 'sendImage',
                 body: {
-                    image: previewImage.src,
-                    imageUri: imageUri,
+                    image: fileType.type === 'video' ? previewVideo.src : previewImage.src,
+                    imageId: imageData,
                     caption: caption
                 }
             }, '*');
