@@ -277,6 +277,22 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+
+            startRecording(callId) {
+                const request = {
+                    action: "start-recording",
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            stopRecording(callId) {
+                const request = {
+                    action: "stop-recording",
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>
