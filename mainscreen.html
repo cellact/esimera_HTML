@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Purple Connect</title>
+    <title>eSIMera</title>
     <link rel="stylesheet" href="assets/fonts/fonts.css">
     <link rel="stylesheet" href="assets/fonts/system-fonts.css">
     <style>
         :root {
-            --primary-white: #ffffff;
-            --secondary-purple: rgb(115, 66, 160);
-            --light-purple: #8e8aff;
-            --dark-purple: #3634a3;
-            --purple-10: rgba(115, 66, 160, 0.1);
-            --purple-20: rgba(115, 66, 160, 0.2);
+            --primary-accent: rgb(115, 66, 160);
+            --primary-light: #8e8aff;
+            --primary-dark: #3634a3;
+            --accent-10: rgba(115, 66, 160, 0.1);
+            --accent-20: rgba(115, 66, 160, 0.2);
             --system-gray: #f2f2f7;
             --system-gray2: #e5e5ea;
             --text-primary: #000000;
@@ -23,16 +22,18 @@
             --input-bg: #f2f2f7;
             --shadow-color: rgba(115, 66, 160, 0.3);
             --shadow-color-active: rgba(115, 66, 160, 0.2);
+            --dialpad-bg: #f8f9fa;
+            --dialpad-btn-bg: #ffffff;
+            --dialpad-btn-active: rgba(115, 66, 160, 0.08);
         }
-        
+
         @media (prefers-color-scheme: dark) {
             :root {
-                --primary-white: #1a1a1a;
-                --secondary-purple: rgb(138, 93, 180);
-                --light-purple: #a28bc7;
-                --dark-purple: #5e3b88;
-                --purple-10: rgba(138, 93, 180, 0.15);
-                --purple-20: rgba(138, 93, 180, 0.25);
+                --primary-accent: rgb(138, 93, 180);
+                --primary-light: #a28bc7;
+                --primary-dark: #5e3b88;
+                --accent-10: rgba(138, 93, 180, 0.15);
+                --accent-20: rgba(138, 93, 180, 0.25);
                 --system-gray: #2c2c2e;
                 --system-gray2: #3a3a3c;
                 --text-primary: #ffffff;
@@ -42,6 +43,9 @@
                 --input-bg: #2c2c2e;
                 --shadow-color: rgba(0, 0, 0, 0.5);
                 --shadow-color-active: rgba(0, 0, 0, 0.7);
+                --dialpad-bg: #1c1c1e;
+                --dialpad-btn-bg: rgba(138, 93, 180, 0.15);
+                --dialpad-btn-active: rgba(138, 93, 180, 0.3);
             }
         }
 
@@ -101,141 +105,143 @@
             -webkit-transform: translateX(-100%) translateZ(0) !important;
         }
 
-        /* Clean header with just search bar */
-        .header {
-            padding: 8px 12px;
+        /* Display area for dialed number */
+        .display-area {
+            padding: 24px 20px 12px;
+            text-align: center;
             background-color: var(--background-color);
-            position: sticky;
-            top: 0;
-            z-index: 5;
-            border-bottom: 0.5px solid var(--separator-color);
         }
 
-        /* New header content container for layout */
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        /* Larger, cleaner search bar */
-        .input-container {
-            display: flex;
-            align-items: center;
-            background-color: var(--input-bg);
-            padding-left: 16px;
-            padding-right: 4px;
-            border-radius: 20px;
-            height: 40px;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .input-container:focus-within {
-            background-color: var(--purple-10);
-            border: 1px solid var(--secondary-purple);
-        }
-
-        .input-icon {
-            font-size: 22px !important;
-            margin-right: 8px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            height: 40px;
-            padding: 0;
-            border: none;
-            font-size: 16px;
-            background: transparent;
+        .display-number {
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: 2px;
             color: var(--text-primary);
-            outline: none;
-            min-width: 0;
-            font-weight: 400;
-        }
-
-        input[type="text"]::placeholder {
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        /* Action buttons */
-        .action-buttons {
-            display: flex;
-            gap: 4px;
-            margin-left: 4px;
-            height: 100%;
-            align-items: center;
-        }
-
-        .action-button {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
-            border-radius: 50%;
-            background-color: var(--secondary-purple);
-            color: white;
-            border: none;
+            min-height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 5px var(--shadow-color);
-            transition: all 0.2s ease;
-            padding: 0;
+            word-break: break-all;
         }
 
-        .action-button:active {
-            transform: scale(0.92);
-            background-color: var(--dark-purple);
-            box-shadow: 0 1px 3px var(--shadow-color-active);
+        .display-number.small {
+            font-size: 24px;
         }
 
-        .action-button i {
-            font-size: 20px;
-        }
-
-        /* Add new contacts button styles */
-        .contacts-button {
-            background: none;
-            border: none;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            transition: background-color 0.2s ease;
-            margin-left: 4px;
-            min-width: 36px;
-        }
-
-        .contacts-button:active {
-            background-color: var(--purple-10);
-        }
-
-        .contacts-button i {
-            font-size: 22px;
-            color: var(--secondary-purple);
-        }
-
-        .iframe-container {
+        /* Dialpad grid */
+        .dialpad-container {
             flex: 1;
-            overflow: hidden;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8px 32px 16px;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        iframe {
+        .dialpad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .dialpad-btn {
+            aspect-ratio: 1.4;
+            border-radius: 50%;
             border: none;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
+            background-color: var(--dialpad-btn-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            width: 72px;
+            height: 72px;
+            justify-self: center;
+        }
+
+        .dialpad-btn:active {
+            background-color: var(--dialpad-btn-active);
+            transform: scale(0.95);
+        }
+
+        .dialpad-btn .digit {
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .dialpad-btn .sub {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            margin-top: 2px;
+        }
+
+        /* Action row (call, delete) */
+        .action-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            padding: 16px 32px 32px;
+        }
+
+        .call-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, rgb(115, 66, 160), #3634a3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(115, 66, 160, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .call-btn:active {
+            transform: scale(0.92);
+            box-shadow: 0 2px 8px rgba(115, 66, 160, 0.3);
+        }
+
+        .call-btn i {
+            font-size: 28px;
+        }
+
+        .delete-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .delete-btn:active {
+            color: var(--text-primary);
+            transform: scale(0.9);
+        }
+
+        .delete-btn i {
+            font-size: 24px;
+        }
+
+        .spacer-btn {
+            width: 48px;
+            height: 48px;
         }
 
         /* Hide scrollbar */
@@ -244,15 +250,15 @@
             background: transparent;
         }
 
-        /* Add these styles */
+        /* Calling overlay */
         .calling-overlay {
             position: fixed;
             top: 16px;
             left: 16px;
             right: 16px;
-            background: linear-gradient(135deg, 
-                rgba(115, 66, 160, 0.5) 0%,
-                rgba(54, 52, 163, 0.5) 100%
+            background: linear-gradient(135deg,
+                rgba(115, 66, 160, 0.6) 0%,
+                rgba(54, 52, 163, 0.6) 100%
             );
             padding: 16px;
             display: flex;
@@ -340,30 +346,79 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="header-content">
-                <div class="input-container">
-                    <i class="material-icons input-icon">search</i>
-                    <input type="text" placeholder="" id="numberInput">
-                    <div class="action-buttons">
-                        <button class="action-button message">
-                            <i class="material-icons">chat</i>
-                        </button>
-                        <button class="action-button call">
-                            <i class="material-icons">call</i>
-                        </button>
-                    </div>
-                </div>
-                <button class="contacts-button">
-                    <i class="material-icons">contacts</i>
+        <!-- Number display -->
+        <div class="display-area">
+            <div class="display-number" id="displayNumber"></div>
+        </div>
+
+        <!-- Dialpad -->
+        <div class="dialpad-container">
+            <div class="dialpad-grid">
+                <button class="dialpad-btn" data-digit="1">
+                    <span class="digit">1</span>
+                    <span class="sub"></span>
+                </button>
+                <button class="dialpad-btn" data-digit="2">
+                    <span class="digit">2</span>
+                    <span class="sub">ABC</span>
+                </button>
+                <button class="dialpad-btn" data-digit="3">
+                    <span class="digit">3</span>
+                    <span class="sub">DEF</span>
+                </button>
+                <button class="dialpad-btn" data-digit="4">
+                    <span class="digit">4</span>
+                    <span class="sub">GHI</span>
+                </button>
+                <button class="dialpad-btn" data-digit="5">
+                    <span class="digit">5</span>
+                    <span class="sub">JKL</span>
+                </button>
+                <button class="dialpad-btn" data-digit="6">
+                    <span class="digit">6</span>
+                    <span class="sub">MNO</span>
+                </button>
+                <button class="dialpad-btn" data-digit="7">
+                    <span class="digit">7</span>
+                    <span class="sub">PQRS</span>
+                </button>
+                <button class="dialpad-btn" data-digit="8">
+                    <span class="digit">8</span>
+                    <span class="sub">TUV</span>
+                </button>
+                <button class="dialpad-btn" data-digit="9">
+                    <span class="digit">9</span>
+                    <span class="sub">WXYZ</span>
+                </button>
+                <button class="dialpad-btn" data-digit="*">
+                    <span class="digit">*</span>
+                    <span class="sub"></span>
+                </button>
+                <button class="dialpad-btn" data-digit="0">
+                    <span class="digit">0</span>
+                    <span class="sub">+</span>
+                </button>
+                <button class="dialpad-btn" data-digit="#">
+                    <span class="digit">#</span>
+                    <span class="sub"></span>
                 </button>
             </div>
         </div>
-        <div class="iframe-container">
-            <iframe src="recentsessions.html" class="shimmer"></iframe>
+
+        <!-- Action row: spacer / call / delete -->
+        <div class="action-row">
+            <div class="spacer-btn"></div>
+            <button class="call-btn" id="callBtn">
+                <i class="material-icons">call</i>
+            </button>
+            <button class="delete-btn" id="deleteBtn">
+                <i class="material-icons">backspace</i>
+            </button>
         </div>
     </div>
+
     <div id="chat-container"></div>
+
     <div class="calling-overlay" id="callingOverlay">
         <div class="calling-left">
             <div class="calling-spinner"></div>
@@ -371,60 +426,76 @@
         </div>
         <button class="cancel-call" id="cancelCall">Cancel</button>
     </div>
+
+    <!-- Hidden input to keep compatibility with SDK fillInput calls -->
+    <input type="hidden" id="numberInput">
+
     <script>
         const controller = window.top.controller;
-        const input = document.querySelector("#numberInput");
-        const callButton = document.querySelector(".call");
-        const messageButton = document.querySelector(".message");
-        const domainButtons = document.querySelectorAll(".domain-button");
+        var dialedNumber = '';
+        const displayNumber = document.getElementById('displayNumber');
+        const callBtn = document.getElementById('callBtn');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const dialpadBtns = document.querySelectorAll('.dialpad-btn');
         const chatContainer = document.getElementById('chat-container');
-        const contactsButton = document.querySelector(".contacts-button");
         const overlay = document.getElementById('callingOverlay');
+        const hiddenInput = document.getElementById('numberInput');
 
         const urlParams = new URLSearchParams(window.location.search);
         const remoteId = urlParams.get('remoteId');
 
         const channel = new BroadcastChannel('myChannel');
 
-        if(remoteId != null) {
+        if (remoteId != null && remoteId !== 'null' && remoteId !== '') {
             console.log("opening chat" + remoteId);
             openChat(remoteId);
         }
 
-        input.addEventListener('input', function(e) {
-            this.value = this.value.toLowerCase();
-        });
+        function updateDisplay() {
+            displayNumber.textContent = dialedNumber || '';
+            displayNumber.classList.toggle('small', dialedNumber.length > 12);
+            hiddenInput.value = dialedNumber;
+        }
 
-        callButton.addEventListener("click", function() {
-            if (input.value === ""){
-                return
-            }
-            makeCall(input.value);
-        });
-
-        messageButton.addEventListener("click", function() {
-            if (input.value === ""){
-                return
-            }
-            openChat(input.value);
-        })
-
-        domainButtons.forEach(button => {
-            button.addEventListener("click", function() {
-                input.value += this.textContent.toLowerCase();
+        // Dialpad button taps
+        dialpadBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var digit = this.getAttribute('data-digit');
+                dialedNumber += digit;
+                updateDisplay();
             });
         });
 
-        contactsButton.addEventListener("click", function() {
-            controller.contactPicker(1);
+        // Delete button (tap = delete one, hold = clear all)
+        deleteBtn.addEventListener('click', function() {
+            dialedNumber = dialedNumber.slice(0, -1);
+            updateDisplay();
         });
 
-        window.addEventListener('message', (event) => {
+        var holdTimer = null;
+        deleteBtn.addEventListener('touchstart', function(e) {
+            holdTimer = setTimeout(function() {
+                dialedNumber = '';
+                updateDisplay();
+            }, 600);
+        });
+        deleteBtn.addEventListener('touchend', function() {
+            clearTimeout(holdTimer);
+        });
+
+        // Call button
+        callBtn.addEventListener('click', function() {
+            if (dialedNumber === '') return;
+            makeCall(dialedNumber);
+        });
+
+        // Listen for messages from iframes / SDK
+        window.addEventListener('message', function(event) {
             switch (event.data.action) {
                 case 'call':
                     makeCall(event.data.body.remoteId, event.data.body.contact);
                     break;
-                    
+
                 case 'chat':
                     openChat(event.data.body.sessionId);
                     break;
@@ -438,9 +509,9 @@
                     break;
 
                 case 'ringing':
-                    // Close the calling overlay if it's open
                     overlay.classList.remove('show');
                     break;
+
                 case 'download-file':
                     downloadFile(event.data.body.messageId, event.data.body.fileId);
                     break;
@@ -450,33 +521,36 @@
                     break;
             }
         });
-        
+
         window.addEventListener('popstate', function(event) {
             console.log("back button pressed");
             closeChat();
         });
 
-        channel.addEventListener('message', (event) => {
+        channel.addEventListener('message', function(event) {
             try {
-                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                console.log("received data: "+event.data)
-                if (data.injectRemoteId !== undefined) input.value = (data.injectRemoteId);
+                var data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                console.log("received data: " + event.data);
+                if (data.injectRemoteId !== undefined) {
+                    dialedNumber = data.injectRemoteId;
+                    updateDisplay();
+                }
             } catch (error) {
                 console.error("Error parsing message data:", error);
             }
         });
 
         function openChat(sessionId) {
-            const iframe = document.createElement('iframe');
+            var iframe = document.createElement('iframe');
             iframe.className = 'chat-iframe';
             iframe.style.cssText = 'width:100%;height:100%;border:none;visibility:hidden;';
-            iframe.src = `chat.html?sessionId=${encodeURIComponent(sessionId)}`;
-            
+            iframe.src = 'chat.html?sessionId=' + encodeURIComponent(sessionId);
+
             chatContainer.innerHTML = '';
             chatContainer.appendChild(iframe);
-            
-            iframe.onload = () => {
-                setTimeout(() => {
+
+            iframe.onload = function() {
+                setTimeout(function() {
                     iframe.style.visibility = 'visible';
                     document.querySelector('.container').classList.add('slide-left');
                     chatContainer.classList.add('slide-left');
@@ -489,45 +563,46 @@
             document.querySelector('.container').classList.remove('slide-left');
             chatContainer.classList.remove('slide-left');
             controller.getRecentSessions(20);
-            
-            // Update the URL in the parent window to reflect we're back to main screen
+
             if (window.parent && window.parent !== window) {
                 console.log("updating url");
-                const currentUrl = new URL(window.parent.location.href);
+                var currentUrl = new URL(window.parent.location.href);
                 currentUrl.searchParams.set('screen', 'MAIN');
                 currentUrl.searchParams.set('remoteId', 'null');
                 window.parent.history.replaceState({}, '', currentUrl.toString());
             }
-            
-            setTimeout(() => {
+
+            setTimeout(function() {
                 chatContainer.innerHTML = '';
             }, 300);
         }
+
         function fillInput(value) {
-            const input = document.getElementById("numberInput");
-            if (input) {
-                input.value = value;
-            }
+            dialedNumber = value;
+            updateDisplay();
         }
+
         function makeCall(remoteId, contact) {
-            const callingId = document.getElementById('callingId');
-            console.log("contact: "+contact);
+            // Append .phonemyemail.global to the dialed number
+            var dialTarget = remoteId + '.phonemyemail.global';
+            console.log("makeCall: input=" + remoteId + " resolved=" + dialTarget);
+
+            var callingId = document.getElementById('callingId');
+            console.log("contact: " + contact);
             callingId.textContent = contact && contact !== '' ? contact : remoteId;
             overlay.classList.add('show');
-            
-            // The cancel button will be handled by the controller
-            document.getElementById('cancelCall').addEventListener('click', () => {
-                controller.rejectCall(remoteId);
+
+            document.getElementById('cancelCall').addEventListener('click', function() {
+                controller.rejectCall(dialTarget);
                 overlay.classList.remove('show');
-                // Controller cancel call functionality will be added here
-            }, { once: true });  // Remove listener after first click
-            
-            controller.call(remoteId);
+            }, { once: true });
+
+            controller.call(dialTarget);
         }
+
         function downloadFile(fileId, cid, messageId) {
-            console.log("downloading file: "+fileId);
+            console.log("downloading file: " + fileId);
             controller.downloadFile(fileId, cid, messageId);
-            // Implement file download functionality here
         }
     </script>
 </body>
