@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>
+        // Redirect any path (like /v1.2.0?params) back to index.html with the same query params
+        var search = window.location.search;
+        var hash = window.location.hash;
+        window.location.replace('/' + 'esimera_HTML/' + search + hash);
+    </script>
+</head>
+<body></body>
+</html>
