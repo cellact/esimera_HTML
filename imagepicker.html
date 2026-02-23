@@ -22,6 +22,7 @@
             display: flex;
             flex-direction: column;
             background: #000;
+            overflow: hidden;
         }
 
         #top-bar {
@@ -47,6 +48,8 @@
             justify-content: center;
             padding: 20px;
             position: relative;
+            overflow: hidden;
+            min-height: 0;
         }
 
         #preview-image {
@@ -61,6 +64,63 @@
             max-width: 100%;
             max-height: 100%;
             display: none; /* Hidden by default, shown when needed */
+            background: #000;
+            object-fit: contain;
+        }
+        
+        #video-thumbnail {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+            object-fit: contain;
+        }
+        
+        #preview-video::-webkit-media-controls-panel {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-play-button {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-start-playback-button {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-timeline {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-current-time-display {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-time-remaining-display {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-mute-button {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-toggle-closed-captions-button {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-volume-slider {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-fullscreen-button {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-download-button {
+            display: none !important;
+        }
+        
+        #preview-video::-webkit-media-controls-overflow-button {
+            display: none !important;
         }
         
         #video-play-button {
@@ -68,13 +128,69 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             display: none; /* Hidden by default, shown when needed */
             align-items: center;
             justify-content: center;
             cursor: pointer;
             font-size: 36px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        #video-play-button:active {
+            transform: scale(0.9);
+        }
+        
+        #video-loading {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            display: none;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        #video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        #video-timeline {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        #video-progress {
+            height: 100%;
+            background: var(--secondary-purple);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        #video-time {
+            color: white;
+            font-size: 12px;
+            text-align: center;
         }
 
         .material-icons {
@@ -123,6 +239,41 @@
                 border: 2px solid rgba(255, 255, 255, 0.5);
             }
         }
+
+        /* Loading overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 10000;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--secondary-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 16px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -134,9 +285,18 @@
     
     <div id="media-container">
         <img id="preview-image" alt="Preview" crossorigin="anonymous">
-        <video id="preview-video" controls></video>
+        <canvas id="thumbnail-canvas" style="display: none;"></canvas>
+        <img id="video-thumbnail" alt="Video thumbnail">
+        <video id="preview-video" playsinline></video>
+        <div id="video-loading"></div>
         <div id="video-play-button">
             <span class="material-icons">play_arrow</span>
+        </div>
+        <div id="video-controls">
+            <div id="video-timeline">
+                <div id="video-progress"></div>
+            </div>
+            <div id="video-time">0:00 / 0:00</div>
         </div>
     </div>
     
@@ -147,6 +307,12 @@
         </button>
     </div>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Sending...</div>
+    </div>
+
     <script>
         const backButton = document.getElementById('back-button');
         const sendButton = document.getElementById('send-button');
@@ -154,6 +320,14 @@
         const previewImage = document.getElementById('preview-image');
         const previewVideo = document.getElementById('preview-video');
         const videoPlayButton = document.getElementById('video-play-button');
+        const videoLoading = document.getElementById('video-loading');
+        const videoControls = document.getElementById('video-controls');
+        const videoTimeline = document.getElementById('video-timeline');
+        const videoProgress = document.getElementById('video-progress');
+        const videoTime = document.getElementById('video-time');
+        const videoThumbnail = document.getElementById('video-thumbnail');
+        const thumbnailCanvas = document.getElementById('thumbnail-canvas');
+        const loadingOverlay = document.getElementById('loading-overlay');
         
         function checkFileType(url) {
             console.log('Checking file type for URL:', url);
@@ -208,23 +382,131 @@
         
         if (fileType.type === 'video') {
             console.log('Setting up video preview');
-            previewVideo.style.display = 'block';
+            
+            // Show loading spinner
+            videoLoading.style.display = 'block';
+            
+            // Set video source
             previewVideo.src = imageData;
             
-            // Add play button overlay
-            videoPlayButton.style.display = 'flex';
-            videoPlayButton.addEventListener('click', () => {
+            // Format time helper
+            function formatTime(seconds) {
+                if (!isFinite(seconds) || isNaN(seconds)) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            // Generate thumbnail from first frame
+            function generateThumbnail() {
+                // Seek to 0.1 seconds to get a better frame (sometimes first frame is black)
+                previewVideo.currentTime = 0.1;
+            }
+            
+            let thumbnailGenerated = false;
+            
+            // When we can seek, generate the thumbnail
+            previewVideo.addEventListener('loadedmetadata', () => {
+                console.log('Video metadata loaded');
+                generateThumbnail();
+            });
+            
+            // Capture the frame when seeked
+            previewVideo.addEventListener('seeked', () => {
+                if (!thumbnailGenerated) {
+                    console.log('Generating thumbnail from video frame');
+                    const canvas = thumbnailCanvas;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Set canvas size to match video
+                    canvas.width = previewVideo.videoWidth;
+                    canvas.height = previewVideo.videoHeight;
+                    
+                    // Draw the video frame to canvas
+                    ctx.drawImage(previewVideo, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convert canvas to image
+                    const thumbnailDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    videoThumbnail.src = thumbnailDataUrl;
+                    videoThumbnail.style.display = 'block';
+                    
+                    // Reset video to start
+                    previewVideo.currentTime = 0;
+                    thumbnailGenerated = true;
+                }
+            });
+            
+            // Handle video loading events
+            previewVideo.addEventListener('loadstart', () => {
+                console.log('Video loading started');
+                videoLoading.style.display = 'block';
+            });
+            
+            previewVideo.addEventListener('loadeddata', () => {
+                console.log('Video data loaded');
+                videoLoading.style.display = 'none';
+                videoPlayButton.style.display = 'flex';
+            });
+            
+            previewVideo.addEventListener('canplay', () => {
+                console.log('Video can play');
+                videoLoading.style.display = 'none';
+            });
+            
+            previewVideo.addEventListener('waiting', () => {
+                videoLoading.style.display = 'block';
+            });
+            
+            previewVideo.addEventListener('playing', () => {
+                videoLoading.style.display = 'none';
+            });
+            
+            // Play button click handler
+            videoPlayButton.addEventListener('click', (e) => {
+                e.stopPropagation();
                 if (previewVideo.paused) {
+                    previewVideo.style.display = 'block';
+                    videoThumbnail.style.display = 'none';
                     previewVideo.play();
                     videoPlayButton.style.display = 'none';
+                    videoControls.style.display = 'flex';
                 } else {
                     previewVideo.pause();
                 }
             });
             
-            // Hide play button when video starts playing
-            previewVideo.addEventListener('play', () => {
-                videoPlayButton.style.display = 'none';
+            // Click on video to pause/play
+            previewVideo.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (previewVideo.paused) {
+                    previewVideo.play();
+                    videoPlayButton.style.display = 'none';
+                    videoControls.style.display = 'flex';
+                } else {
+                    previewVideo.pause();
+                    videoPlayButton.style.display = 'flex';
+                }
+            });
+            
+            // Update progress and time
+            previewVideo.addEventListener('timeupdate', () => {
+                if (isFinite(previewVideo.duration)) {
+                    const progress = (previewVideo.currentTime / previewVideo.duration) * 100;
+                    videoProgress.style.width = progress + '%';
+                    videoTime.textContent = `${formatTime(previewVideo.currentTime)} / ${formatTime(previewVideo.duration)}`;
+                }
+            });
+            
+            // Timeline click to seek - FIXED
+            videoTimeline.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const rect = videoTimeline.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const pos = Math.max(0, Math.min(1, clickX / rect.width));
+                console.log('Timeline clicked at position:', pos, 'duration:', previewVideo.duration);
+                if (isFinite(previewVideo.duration)) {
+                    previewVideo.currentTime = pos * previewVideo.duration;
+                }
             });
             
             // Show play button when video is paused
@@ -233,8 +515,17 @@
             });
             
             // Hide play button when video is playing
-            previewVideo.addEventListener('playing', () => {
+            previewVideo.addEventListener('play', () => {
                 videoPlayButton.style.display = 'none';
+                videoControls.style.display = 'flex';
+            });
+            
+            // Video ended
+            previewVideo.addEventListener('ended', () => {
+                videoPlayButton.style.display = 'flex';
+                videoThumbnail.style.display = 'block';
+                previewVideo.style.display = 'none';
+                previewVideo.currentTime = 0;
             });
         } else {
             console.log('Setting up image preview');
@@ -296,14 +587,27 @@
         // Handle send button
         sendButton.addEventListener('click', () => {
             const caption = captionInput.value.trim();
+            const imageId = hashData.get('imageId'); // Get the file path for uploading
+            
+            // Show loading overlay
+            loadingOverlay.classList.add('active');
+            
             window.parent.postMessage({
                 action: 'sendImage',
                 body: {
                     image: fileType.type === 'video' ? previewVideo.src : previewImage.src,
-                    imageId: imageData,
+                    fileId: imageId, // Send the file:// URL for uploading
                     caption: caption
                 }
             }, '*');
+        });
+
+        // Listen for upload complete message from parent
+        window.addEventListener('message', (event) => {
+            if (event.data.action === 'uploadComplete' || event.data.action === 'closeImagePicker') {
+                // Hide loading overlay
+                loadingOverlay.classList.remove('active');
+            }
         });
     </script>
 </body>

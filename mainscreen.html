@@ -486,14 +486,14 @@
         // Call button
         callBtn.addEventListener('click', function() {
             if (dialedNumber === '') return;
-            makeCall(dialedNumber);
+            makeCall(null, dialedNumber);
         });
 
         // Listen for messages from iframes / SDK
         window.addEventListener('message', function(event) {
             switch (event.data.action) {
                 case 'call':
-                    makeCall(event.data.body.remoteId, event.data.body.contact);
+                    makeCall(event.data.body.sessionId, event.data.body.sessionName);
                     break;
 
                 case 'chat':
@@ -582,14 +582,11 @@
             updateDisplay();
         }
 
-        function makeCall(remoteId, contact) {
-            // Append .phonemyemail.global to the dialed number
-            var dialTarget = remoteId + '.phonemyemail.global';
-            console.log("makeCall: input=" + remoteId + " resolved=" + dialTarget);
+        function makeCall(sessionId, sessionName) {
+            var dialTarget = (sessionName || sessionId || '') + '.phonemyemail.global';
 
             var callingId = document.getElementById('callingId');
-            console.log("contact: " + contact);
-            callingId.textContent = contact && contact !== '' ? contact : remoteId;
+            callingId.textContent = sessionName || sessionId || dialTarget;
             overlay.classList.add('show');
 
             document.getElementById('cancelCall').addEventListener('click', function() {
@@ -597,7 +594,7 @@
                 overlay.classList.remove('show');
             }, { once: true });
 
-            controller.call(dialTarget);
+            controller.callRemote(dialTarget);
         }
 
         function downloadFile(fileId, cid, messageId) {

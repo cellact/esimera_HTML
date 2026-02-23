@@ -407,9 +407,6 @@
                 <button class="call-button" id="muteButton">
                     <i class="material-icons">mic</i>
                 </button>
-                <button class="call-button" id="recordButton">
-                    <i class="material-icons">fiber_manual_record</i>
-                </button>
                 <button class="call-button" id="speakerButton">
                     <i class="material-icons">volume_up</i>
                 </button>
@@ -448,7 +445,6 @@
         const dialerButton = document.getElementById('dialerButton');
         const dialerContainer = document.getElementById('dialerContainer');
         const dialerFrame = document.getElementById('dialerFrame');
-        const recordButton = document.getElementById('recordButton');
 
         const audioDevicesDropdown = document.querySelector("#audioDevicesDropdown");
         const deviceList = document.querySelector("#deviceList");
@@ -599,18 +595,6 @@
                 !speakerButton.contains(event.target)) {
                 audioDevicesDropdown.classList.remove('open');
             }
-        });
-
-        var isRecording = false;
-        recordButton.addEventListener('click', () => {
-            if (isRecording) {
-                controller.stopRecording(callId);
-            } else {
-                controller.startRecording(callId);
-            }
-            isRecording = !isRecording;
-            recordButton.classList.toggle('active', isRecording);
-            recordButton.querySelector('.material-icons').textContent = isRecording ? 'stop' : 'fiber_manual_record';
         });
     </script>
 </body>

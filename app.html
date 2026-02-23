@@ -43,14 +43,27 @@
         const screen = decodeURIComponent(urlParams.get('screen'));
         const localId = decodeURIComponent(urlParams.get('localId'));
         const remoteId = decodeURIComponent(urlParams.get('remoteId'));
+        const sessionId = decodeURIComponent(urlParams.get('sessionId'));
+
+        // Replace current history state on load to prevent duplicate entries from WebView navigation
+        history.replaceState({page: 'app', localId: localId}, '', window.location.href);
+
+        // Close broadcast channel on page unload to prevent zombie listeners
+        window.addEventListener('pagehide', () => {
+            channel.close();
+        });
 
         switch (screen) {
             case 'MAIN':
-                screenFrame.src = "mainscreen.html";
+                screenFrame.src = "mainscreen.html?localId="+encodeURIComponent(localId);
                 break;
             case 'CHAT':
             //    history.replaceState({}, '', 'app.html?screen=MAIN&localId='+encodeURIComponent(localId)+'&remoteId=null');
-                screenFrame.src = "mainscreen.html?remoteId="+encodeURIComponent(remoteId);
+            if (sessionId !== 'null' && sessionId !== null && sessionId !== "") {
+                screenFrame.src = "mainscreen.html?localId="+encodeURIComponent(localId)+"&sessionId="+encodeURIComponent(sessionId);
+            } else if (remoteId !== 'null' && remoteId !== null && remoteId !== "") {
+                screenFrame.src = "mainscreen.html?localId="+encodeURIComponent(localId)+"&remoteId="+encodeURIComponent(remoteId);
+            }
             //    screenFrame.onload = function() {
             //        screenFrame.contentWindow.postMessage({
             //            action: 'chat',
@@ -118,6 +131,8 @@
             dataFetched(jsonData) {
                 console.log('Received raw data:', JSON.stringify(jsonData));
                 const data = JSON.parse(JSON.stringify(jsonData));
+                // Add localId to message so zombie pages can filter
+                data._targetLocalId = localId;
                 try {
                     channel.postMessage(data);
                 } catch (error) {
