@@ -583,18 +583,23 @@
         }
 
         function makeCall(sessionId, sessionName) {
-            var dialTarget = (sessionName || sessionId || '') + '.phonemyemail.global';
-
             var callingId = document.getElementById('callingId');
-            callingId.textContent = sessionName || sessionId || dialTarget;
+            callingId.textContent = sessionName || sessionId || '';
             overlay.classList.add('show');
 
-            document.getElementById('cancelCall').addEventListener('click', function() {
-                controller.rejectCall(dialTarget);
-                overlay.classList.remove('show');
-            }, { once: true });
-
-            controller.callRemote(dialTarget);
+            if (sessionId) {
+                document.getElementById('cancelCall').addEventListener('click', function() {
+                    controller.rejectCall(sessionId);
+                    overlay.classList.remove('show');
+                }, { once: true });
+                controller.callSession(sessionId);
+            } else {
+                document.getElementById('cancelCall').addEventListener('click', function() {
+                    controller.rejectCall(sessionName);
+                    overlay.classList.remove('show');
+                }, { once: true });
+                controller.callRemote(sessionName);
+            }
         }
 
         function downloadFile(fileId, cid, messageId) {
